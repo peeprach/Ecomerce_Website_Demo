@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Page</title>
+    <link rel="stylesheet" href="product_style.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo" onclick="reloadPage()">
+        <img src="/images/logo433.png" alt="DES403 Logo" class="logo-img">
+        <span class="logo-text"> CSS MALL</span>
+        </div>
+        <ul class="nav-links">
+        <li><a href="../home.html">Home</a></li>
+        <li><a href="../shop.html" class="active">Shop</a></li>
+        <li><a href="../coupon.html">Coupon</a></li>
+        <li><a href="../acc.html">My account</a></li>
+        <li><a href="#"><i class="icon-user"></i></a></li>
+        <li>
+            <a href="../cart.html">
+                <img src="/images/shopping-cart.png" alt="Cart" class="cart-icon">
+            </a>     
+        <li><a href="login.html" id="logout-btn">Logout</a></li>      
+        </ul>
+    </nav>
+
+
+    <!-- Product Section -->
+    <section class="product-container">
+        <div class="product-images">
+            <div class="product-images">
+                <div class="product-image">
+                    <img src="/images/product1.jpg" alt="Main Product Image" id="main-product-image">
+                </div>
+                <div class="thumbnail-images">
+                    <img src="/images/product1.jpg" alt="Thumbnail 1" class="active" onclick="changeMainImage('/images/product1.jpg')">
+                    <img src="/images/nike2.png" alt="Thumbnail 2" onclick="changeMainImage('/images/nike2.png')">
+                    <img src="/images/nike3.jpg" alt="Thumbnail 3" onclick="changeMainImage('/images/nike3.jpg')">
+                    <img src="/images/nike3.png" alt="Thumbnail 4" onclick="changeMainImage('/images/nike3.png')">
+                </div>
+            </div>
+            
+        </div>
+        <div class="product-details">
+            <h1>Nike-Tshirt</h1>
+            <div class="price">฿740</div>
+            <div class="rating" aria-label="4 out of 5 stars">&#9733;&#9733;&#9733;&#9733;&#9734; (5 Customer Reviews)</div>
+            <p>เสื้อยืดผู้ชาย Nike Sportswear ของแท้ 100%.</p>
+            <div class="options">
+                <div class="size">
+                    <span>Size:</span>
+                    <button>40</button>
+                    <button>44</button>
+                    <button>48</button>
+                </div>
+                <div class="color">
+                    <span>Color:</span>
+                    <button class="white">Black</button>
+                    <button class="white">White</button>
+                </div>
+            </div>
+
+            <div class="buttons">
+                <div class="amount">
+                    <button>-</button>
+                    <input type="text" value="1" aria-label="Quantity">
+                    <button>+</button>
+                </div>
+                <a href="#" class="chat-now">Chat Now</a>
+            </div>
+
+            <div class="buttons">
+                <button class="cart" onclick="addToCart()">Add To Cart</button>
+                <button class="compare">+ Compare</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="active">Description</button>
+        <button>Additional Information</button>
+        <button>Reviews [5]</button>
+    </div>
+
+  <!-- Related Products -->
+    <section class="related-products">
+        <div class="related-item">
+            <img src="../images/product1.jpg" alt="Nike Sportswear Men's T-Shirt">
+            <div class="item-details">
+                <h4>Nike Sportswear Men's T-Shirt</h4>
+                <p>The Nike Sportswear T-Shirt keeps you ready with soft cotton jersey fabric and a classic logo on the chest. Soft fabric feels comfortable against your skin. A lattice logo on the chest shows your love for sport. A ribbed crew neck is comfortable and durable.</p>
+                <p><strong>Color:</strong> Black</p>
+                <p><strong>Type:</strong> Men's T-Shirt</p>
+                <p><strong>Code:</strong> BV0508-010</p>
+                <h5>Sizes:</h5>
+                <ul>
+                    <li>S : 40 (Chest/inch)</li>
+                    <li>M : 44 (Chest/inch)</li>
+                    <li>L : 48 (Chest/inch)</li>
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>CSS493 Computer Engineering Project</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const minusBtn = document.querySelector('.amount button:first-child');
+            const plusBtn = document.querySelector('.amount button:last-child');
+            const amountInput = document.querySelector('.amount input');
+            const thumbnails = document.querySelectorAll('.thumbnail-images img');
+            const mainImage = document.querySelector('.product-image img');
+            const sizeButtons = document.querySelectorAll('.size button');
+            const colorButtons = document.querySelectorAll('.color button');
+
+            // Function to increase value
+            plusBtn.addEventListener('click', () => {
+                let value = parseInt(amountInput.value);
+                if (!isNaN(value)) {
+                    amountInput.value = value + 1;
+                }
+            });
+
+            // Function to decrease value
+            minusBtn.addEventListener('click', () => {
+                let value = parseInt(amountInput.value);
+                if (!isNaN(value) && value > 1) {
+                    amountInput.value = value - 1;
+                }
+            });
+
+            // Thumbnail click event
+            thumbnails.forEach((thumbnail) => {
+                thumbnail.addEventListener('click', () => {
+                    thumbnails.forEach(img => img.classList.remove('active'));
+                    thumbnail.classList.add('active');
+                    mainImage.src = thumbnail.src;
+                });
+            });
+
+            // Size button active toggle
+            sizeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    sizeButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                });
+            });
+
+            // Color button active toggle
+            colorButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    colorButtons.forEach(btn => btn.classList.remove('active'));
+                    button.classList.add('active');
+                });
+            });
+        });
+    </script>
+    <script>
+        function addToCart() {
+        // ข้อมูลสินค้า เช่น ชื่อ, ราคา, ขนาด, สี ฯลฯ
+        const product = {
+            name: "Nike-Tshirt",   // ชื่อสินค้า
+            price: "฿740",         // ราคา
+            image: document.getElementById('main-product-image').src,  // รูปภาพหลักของสินค้า
+            quantity: document.querySelector('.amount input').value, // จำนวนที่เลือก
+        };
+
+        // ตรวจสอบว่ามีสินค้าในรถเข็นแล้วหรือยัง
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        // เช็คว่ามีสินค้านี้ในตะกร้าแล้วหรือไม่
+        const existingItemIndex = cart.findIndex(item => item.name === product.name && item.price === product.price);
+        if (existingItemIndex !== -1) {
+            // ถ้ามีสินค้าชนิดเดียวกันอยู่ในตะกร้าแล้ว เพิ่มจำนวน
+            cart[existingItemIndex].quantity = parseInt(cart[existingItemIndex].quantity) + parseInt(product.quantity);
+        } else {
+            // ถ้าไม่มี ให้เพิ่มสินค้าลงในตะกร้า
+            cart.push(product);
+        }
+
+        // บันทึกสินค้าลงใน localStorage
+        localStorage.setItem('cart', JSON.stringify(cart));
+
+        // แจ้งเตือนผู้ใช้ว่าเพิ่มสินค้าลงในรถเข็นแล้ว
+        alert("The product has been added to the cart!");
+    }
+    </script>
+</body>
+</html>

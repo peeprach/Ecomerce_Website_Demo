@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop Page</title>
+  <link rel="stylesheet" href="home.css">
+  <!-- Firebase UMD Build -->
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+      <div class="logo">
+        <img src="images/logo433.png" alt="DES403 Logo" class="logo-img">
+        <span class="logo-text"> CSS MALL</span>
+      </div>
+      <ul class="nav-links">
+        <li><a href="home.html" class="active">Home</a></li>
+        <li><a href="shop.html">Shop</a></li>
+        <li><a href="coupon.html">Coupon</a></li>
+        <li class="dropdown">
+          <a href="#" class="dropbtn">My account</a>
+          <div class="dropdown-content">
+            <a href="acc.html">My Profile</a>
+            <a href="myshop.html">My Shop</a>
+            <a href="login.html" id="logout-btn" class="logout-btn">Logout</a>
+          </div>
+        </li> 
+        <li>
+          <a href="cart.html">
+              <img src="images/shopping-cart.png" alt="Cart" class="cart-icon">
+          </a>
+        </li>  
+      </ul>
+    </nav>
+
+    <section class="login-container">
+        <!-- Background Image -->
+        <div class="background">
+            <img src="images/welcome_bg.png" alt="CSS MALL Background" class="bg-image">
+            
+            <!-- Overlay Box -->
+            <div class="overlay-box">
+                <h2>Welcome to CSS Mall</h2>
+                <p>Place where you can buy everything</p>
+                <a href="shop.html" class="btn-login">Get Start</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="verify-system">
+      <div class="verify">
+        <h2>Why Us</h2>
+      </div>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const logoutButton = document.getElementById('logout-btn');
+            
+            // If needed, clear user session or cookies before redirecting
+            logoutButton.addEventListener('click', () => {
+                // Clear any session data (if applicable) or perform any other necessary actions
+                // For example, localStorage.removeItem('user'); if you're storing user info in localStorage
+
+                // Redirect to login page
+                window.location.href = 'login.html'; // Adjust the URL if your login page is different
+            });
+        });
+    </script>
+</body>
+</html>

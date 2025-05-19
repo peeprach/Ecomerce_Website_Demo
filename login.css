@@ -1,0 +1,272 @@
+/* General Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Arial', sans-serif;
+    line-height: 1.6;
+    background-color: #f8f9fa;
+}
+
+/* Navbar */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* ปรับระยะห่าง */
+  }
+  
+  .logo img {
+    height: 40px;
+    width: auto;
+  }
+  
+  .logo-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: #232323;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-left: 20px; /* เพิ่มช่องว่างระหว่างเส้นกับข้อความ */
+  }
+  
+  .logo-text::before {
+    content: "";
+    display: inline-block;
+    width: 2px; /* ความกว้างของเส้น */
+    height: 30px; /* ความยาวของเส้น */
+    background-color: #aaa; /* สีของเส้น */
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+
+.nav-links {
+    list-style: none;
+    display: flex;
+}
+
+.nav-links li {
+    margin: 0 10px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+}
+
+.icons img {
+    width: 20px;
+    margin-left: 15px;
+}
+
+/* Welcome Section */
+.welcome-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 90vh;
+    background: url('images/welcome_bg.png') no-repeat center center/cover;
+    color: #333;
+    text-align: center;
+    padding: 20px;
+}
+
+.welcome-section .content {
+    background: rgba(255, 255, 255, 0.8);
+    padding: 20px 40px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.welcome-section h2 {
+    font-size: 20px;
+    color: #d4a373;
+    margin-bottom: 10px;
+}
+
+.welcome-section h1 {
+    font-size: 2.5rem;
+    margin-bottom: 20px;
+}
+
+.welcome-section p {
+    font-size: 1rem;
+    margin-bottom: 20px;
+    color: #232323;
+}
+
+.btn-login {
+    background-color: #d4a373;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.btn-login:hover {
+    background-color: #b38754;
+}
+
+/* ตั้งค่า Layout */
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 80vh;
+    background: linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)), 
+                url('images/welcome_bg.png') no-repeat center center/cover;
+    padding: 20px;
+}
+
+/* ปุ่มล็อกอินที่มีไอคอน */
+.btn-login-with-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px 0 10px 0;
+    width: 100%;
+    border-radius: 5px;
+    cursor: pointer;
+    border: 1px solid #ddd;
+    margin: 10px;
+}   
+
+.btn-google .btn-apple .btn-phone {
+    background-color: white;
+    color: black;
+    border-color: #ddd;
+}
+
+.btn-google:hover {
+    background-color: #ffe2cd;
+}
+.btn-apple:hover {
+    background-color: #ffe2cd;
+}
+.btn-phone:hover {
+    background-color: #ffe2cd;
+}
+
+
+.btn-login-with-icon img {
+    width: 20px;
+    height: 20px;
+}
+
+
+/* ส่วนซ้าย (Logo) */
+.left-side {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+.left-side h2{
+    font-size: 26px;
+    font-weight: bold;
+}
+.large-logo {
+    width: 200px;
+    margin-bottom: 10px;
+}
+/* ส่วนขวา (Login Form) */
+.login-form {
+    flex: 1;
+    max-width: 400px;
+    background: white;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    /*text-align: center;*/
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-right: 150px;
+}
+
+.login-form input {
+    width: 100%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.login-form h2 {
+    text-align: left;
+    margin-right: auto;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.login-form p {
+    text-align: center;
+    padding-top: 15px;
+    color: #999999;
+    font-size: 16px;
+}
+
+.login-form p a {
+    color: #ff9b0e; /* กำหนดให้ "Sign Up" เป็นสีเหลือง */
+    text-decoration: none; /* เอาเส้นใต้ของลิงก์ออก */
+    font-weight: bold; /* ทำให้ตัวหนาขึ้น (ถ้าต้องการ) */
+}
+
+.login-form p a:hover {
+    color: #1c1e20; /* เปลี่ยนเป็นสีทองเมื่อโฮเวอร์ */
+}
+
+.btn-login {
+    background-color: #ff9b0e;
+    color: white;
+    border: none;
+    padding: 10px;
+    width: 100%;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.btn-login:hover {
+    background-color: #e08800;
+}
+
+/* ปรับให้แสดงเป็นคอลัมน์เดียวในมือถือ */
+@media (max-width: 768px) {
+    .login-container {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .left-side {
+        margin-bottom: 20px;
+    }
+
+    .login-form {
+        width: 100%;
+        max-width: 300px;
+    }
+}

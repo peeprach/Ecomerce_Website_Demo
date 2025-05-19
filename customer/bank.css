@@ -1,0 +1,289 @@
+/* General Reset */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: Arial, sans-serif;
+    box-sizing: border-box;
+    font-weight: bold;
+  }
+  
+  /* Navigation Bar */
+  .navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background-color: #fff;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+    
+    .cart-icon {
+      width: 24px; /* ปรับขนาดไอคอนตามต้องการ */
+      height: auto;
+      vertical-align: middle;
+      margin-top: -5px;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 20px; /* ปรับระยะห่าง */
+    }
+    
+    .logo img {
+      height: 40px;
+      width: auto;
+    }
+    
+    .logo-text {
+      font-size: 18px;
+      font-weight: bold;
+      color: #232323;
+      display: flex;
+      align-items: center;
+      position: relative;
+      padding-left: 20px; /* เพิ่มช่องว่างระหว่างเส้นกับข้อความ */
+    }
+    
+    .logo-text::before {
+      content: "";
+      display: inline-block;
+      width: 2px; /* ความกว้างของเส้น */
+      height: 30px; /* ความยาวของเส้น */
+      background-color: #aaa; /* สีของเส้น */
+      position: absolute;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 40px;
+    }
+    
+    .nav-links li a {
+      text-decoration: none;
+      color: #333;
+      font-weight: 600;
+    }
+    
+    .nav-links li a.active {
+      color: #ffc107;
+    }
+  
+    .container {
+      display: flex;
+      width: 80%;
+      height: 80vh;
+      background: white;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-left: 140px;
+      margin-top: 20px;
+  }
+  
+  /* Sidebar */
+  .sidebar {
+      width: 20%;
+      background: #f8f8f8;
+      color: black;
+      padding: 20px;
+  }
+  
+  .profile-section {
+      text-align: center;
+      margin-bottom: 20px;
+      align-items: center;
+      flex-direction: column;
+      display: flex;
+  }
+  
+  .profile-pic {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+      object-fit: cover;
+      border: 3px solid #ccc;
+      cursor: pointer;
+  }
+  
+  .edit-profile {
+      display: block;
+      color: #f39c12;
+      text-decoration: none;
+      font-size: 14px;
+  }
+  .menu{
+    width: 100%;
+    max-width: 250px;
+  }
+  .menu ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .menu ul li {
+    position: relative;
+    margin-bottom: -5px;
+  }
+  
+  .menu ul li a {
+    display: flex;
+    align-items: center;
+    gap: 12px; /* ระยะห่างระหว่างไอคอนกับข้อความ */
+    padding: 8px;
+    font-size: 14px;
+    text-decoration: none;
+    color: black;
+  }
+  .menu ul li a .icon {
+    width: 24px;  /* ปรับขนาดไอคอน */
+    height: 24px;
+  }
+  
+  .submenu {
+    display: block;
+    padding-left: 20px;
+  }
+  .submenu.show {
+    display: block; /* แสดงเมนูเมื่อมี class 'show' */
+  }
+  
+  .menu ul li:hover .submenu {
+    display: block; /* แสดงเมนูย่อยเมื่อ hover */
+  }
+  
+  .submenu li {
+    margin-top: 5px;
+    margin-left: 50px;
+  }
+  
+  .submenu a {
+    font-size: 14px;
+    color: #666;
+  }
+  .submenu a.active {
+    color: #ffc107; /* Yellow color */
+  }
+  .menu ul li a:hover,
+  .menu ul li a:focus,
+  .submenu li a:hover,
+  .submenu li a:focus {
+      color: #ffc107;
+      font-weight: bold;
+  }
+  
+  /* Main Content */
+  .main-content {
+      width: 70%;
+      padding: 30px;
+  }
+  
+  h2 {
+      color: #333;
+  }
+  
+  .profile-subtitle {
+    margin-top: -15px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #ccc; /* สีเทาอ่อน */
+    display: inline-block; /* ปรับให้เส้นมีความยาวตามข้อความ */
+    width: 100%; /* หรือกำหนดเป็นความกว้างที่ต้องการ */
+  }
+
+  /* Active link style */
+.active-link {
+    color: #ffc107;
+}
+
+#card-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* จัดกึ่งกลางแนวนอน */
+  justify-content: center; /* จัดกึ่งกลางแนวตั้ง */
+  text-align: center; /* จัดข้อความให้อยู่ตรงกลาง */
+  min-height: 200px; /* ป้องกันการบีบตัวเมื่อไม่มีข้อมูล */
+}
+
+#add-new-card {
+  margin-top: 10px; /* เพิ่มระยะห่างจากข้อความ */
+  padding: 10px 20px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+#add-new-card:hover {
+  background-color: #0056b3;
+}
+
+#card-form {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+/* Dropdown container */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown button style */
+.dropbtn {
+  color: white;
+  text-decoration: none;
+  display: inline-block;
+}
+
+/* Dropdown content (hidden by default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 12px 16px rgba(0,0,0,0.2);
+  z-index: 1;
+  font-size: 14px;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #f9f9f9; /* หรือไม่ต้องใส่ก็ได้ */
+  color: #ffc107;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Optional: highlight dropdown button on hover */
+.dropdown:hover .dropbtn {
+  background-color: #dbdbdb;
+}
+
+.dropdown-content a:active {
+  background-color: #ffc107;
+  color: white;
+}
+

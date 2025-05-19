@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>My Shop</title>
+    <link rel="stylesheet" href="myshop.css"/>
+    <!-- Firebase UMD Build -->
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-storage-compat.js"></script>
+    <!-- Chart.js for graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+        <img src="images/logo433.png" alt="DES403 Logo" class="logo-img" />
+        <span class="logo-text">CSS MALL</span>
+        </div>
+        <ul class="nav-links">
+        <li><a href="home.html">Home</a></li>
+        <li><a href="shop.html">Shop</a></li>
+        <li><a href="coupon.html">Coupon</a></li>
+        <li class="dropdown">
+            <a href="#" class="dropbtn">My Account</a>
+            <div class="dropdown-content">
+            <a href="acc.html">My Profile</a>
+            <a href="myshop.html" class="active">My Shop</a>
+            <a href="#" id="logout-btn">Logout</a>
+            </div>
+        </li>
+        <li>
+            <a href="cart.html">
+            <img src="images/shopping-cart.png" alt="Cart" class="cart-icon" />
+            </a>
+        </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-container">
+        <!-- Shop Header -->
+        <section class="shop-header">
+            <h2 id="shop-name">My Shop</h2>
+            <a href="viewshop.html" class="view-shop-btn">View Shop</a>
+        </section>
+        <hr />
+
+        <!-- Order Status Section -->
+        <section class="order-status-section">
+            <div class="order-status-header">
+                <h3>Order Status</h3>
+                <a href="#" id="view-sales-history" class="view-history-link">View Sales History &gt;</a>
+            </div>
+            <div class="status-boxes">
+                <div class="status-box">
+                    <div class="status-label">To Ship</div>
+                    <div id="to-ship-count" class="status-count">0</div>
+                </div>
+                <div class="status-box">
+                    <div class="status-label">Cancelled</div>
+                    <div id="cancelled-count" class="status-count">0</div>
+                </div>
+                <div class="status-box">
+                    <div class="status-label">Return</div>
+                    <div id="return-count" class="status-count">0</div>
+                </div>
+                <div class="status-box">
+                    <div class="status-label">Review</div>
+                    <div id="review-count" class="status-count">0</div>
+                </div>
+            </div>
+        </section>
+
+        <hr class="section-divider" />
+
+        <!-- My Products Section -->
+        <section id="product-performance-toggle">
+            <div class="performance-header">
+                <a href="add-product.html">
+                    <button id="my-products-btn">My Products</button>
+                </a>
+                <button id="shop-performance-btn">Shop Performance</button>
+            </div>
+        </section>
+          
+        <!-- My Products Section (Redirect Button) -->
+        <section id="my-products" style="display: none">
+            <ul id="product-list"></ul>
+        </section>
+          
+        <!-- Shop Performance Popup Modal -->
+        <div id="performance-popup" class="modal" style="display:none;">
+            <div class="modal-content">
+                <span class="close-btn" id="close-performance">&times;</span>
+                <h3>&larr;    Shop Performance</h3>
+            
+                <div class="performance-tabs">
+                    <button class="active">Sales</button>
+                    <button>Products</button>
+                </div>
+                <hr class="section-divider" />
+          
+                <div class="period-options">
+                    <div class="order-period">
+                        <span>Order Period:</span>
+                        <span style="font-weight: 100; font-size: 14px;">Last updated at <span id="last-updated">--:--</span></span>
+                    </div>
+                    <div class="d-flex justify-space-between flex-wrap gap-2 my-3 period-button-group">
+                        <button class="period-button active" onclick="loadPerformance('realtime', this)">Real-Time</button>
+                        <button class="period-button" onclick="loadPerformance('yesterday', this)">Yesterday</button>
+                        <button class="period-button" onclick="loadPerformance('7days', this)">Past 7 Days</button>
+                        <button class="period-button" onclick="loadPerformance('30days', this)">Past 30 Days</button>
+                        <button class="period-button" onclick="loadPerformance('week', this)">This Week</button>
+                        <button class="period-button" onclick="loadPerformance('month', this)">This Month</button>
+                    </div>      
+                </div>
+                <hr class="section-divider" />
+          
+                <div class="key-metrics">
+                    <div class="metrics-header">
+                        <span>Key Metrics</span>
+                        <select>
+                            <option>Confirmed Order</option>
+                        </select>
+                    </div>
+                    <div class="metrics-cards">
+                        <div class="metric-card">Sales</div>
+                        <div class="metric-card">Orders</div>
+                        <div class="metric-card">Sales per order</div>
+                    </div>
+                </div>
+                <canvas id="sales-chart" style="margin-top: 20px;"></canvas>
+            </div>
+        </div>
+    </main>
+
+    <!-- Firebase Configuration and Initialization -->
+    <script>
+        const firebaseConfig = {
+        apiKey: "AIzaSyCogse_Ke5U0xzdFoiQDv-85AzhMKnieCw",
+        authDomain: "des400-d3feb.firebaseapp.com",
+        projectId: "des400-d3feb",
+        storageBucket: "des400-d3feb.appspot.com",
+        messagingSenderId: "1063674569994",
+        appId: "1:1063674569994:web:525070c6d1500d93a806f3",
+        measurementId: "G-DW42H6ES0R"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storageRef = firebase.storage().ref();
+    
+        let currentUser = null;
+
+        auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            currentUser = user;
+            const userDoc = await db.collection("users").doc(user.uid).get();
+            const userData = userDoc.data();
+            const shopName = userData.name || "My Shop";
+            document.getElementById("shop-name").textContent = shopName;
+
+            // Load order statuses
+            loadOrderStatuses(user.uid);
+
+            // Load user's products
+            loadUserProducts(user.uid);
+        } else {
+            window.location.href = "signup.html";
+        }
+        });
+
+        async function loadOrderStatuses(userId) {
+        const ordersSnapshot = await db.collection("orders").where("sellerId", "==", userId).get();
+        let toShip = 0, cancelled = 0, returned = 0, review = 0;
+
+        ordersSnapshot.forEach(doc => {
+            const status = doc.data().status;
+            if (status === "to ship") toShip++;
+            else if (status === "cancelled") cancelled++;
+            else if (status === "return") returned++;
+            else if (status === "review") review++;
+        });
+
+            document.getElementById("to-ship-count").textContent = toShip;
+            document.getElementById("cancelled-count").textContent = cancelled;
+            document.getElementById("return-count").textContent = returned;
+            document.getElementById("review-count").textContent = review;
+        }
+
+        async function loadUserProducts(userId) {
+            const productsSnapshot = await db.collection("products").where("sellerId", "==", userId).get();
+            const productList = document.getElementById("product-list");
+            productList.innerHTML = "";
+
+            productsSnapshot.forEach(doc => {
+                const product = doc.data();
+                const li = document.createElement("li");
+                li.textContent = product.name;
+                productList.appendChild(li);
+            });
+        }
+
+        document.getElementById("logout-btn").addEventListener("click", () => {
+            auth.signOut().then(() => {
+                window.location.href = "login.html";
+            });
+        });
+
+        document.getElementById("my-products-btn").addEventListener("click", () => {
+            document.getElementById("performance-popup").style.display = "none";
+            document.getElementById("my-products").style.display = "block";
+        });
+
+        document.getElementById("shop-performance-btn").addEventListener("click", () => {
+            document.getElementById("my-products").style.display = "none";
+            document.getElementById("performance-popup").style.display = "block";
+            loadPerformance("30days");
+        });
+
+        document.getElementById("close-performance").addEventListener("click", () => {
+            document.getElementById("performance-popup").style.display = "none";
+        });
+
+        /*document.getElementById("back-to-products").addEventListener("click", () => {
+            document.getElementById("performance-popup").style.display = "none";
+            document.getElementById("my-products").style.display = "block";
+        });*/
+
+        function getStepSize(data) {
+            const max = Math.max(...data);
+            if (max <= 10) return 1;
+            if (max <= 50) return 5;
+            if (max <= 100) return 10;
+            return Math.ceil(max / 10);
+        }
+
+        
+        async function loadPerformance(period, buttonEl) {
+            // ปรับปุ่ม active
+            const allButtons = document.querySelectorAll(".period-button");
+            allButtons.forEach(btn => btn.classList.remove("active"));
+            if (buttonEl) buttonEl.classList.add("active");
+
+            if (!currentUser) return;
+
+            const ordersSnapshot = await db.collection("orders")
+                .where("sellerId", "==", currentUser.uid)
+                .get();
+
+            const now = new Date();
+            const salesData = {};
+
+            ordersSnapshot.forEach(doc => {
+                const order = doc.data();
+                const date = order.date?.toDate?.() || new Date();
+                let key = "";
+
+                if (period === "day") {
+                    key = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+                } else if (period === "week") {
+                    const weekStart = new Date(date);
+                    weekStart.setDate(date.getDate() - date.getDay());
+                    key = `Week of ${weekStart.toISOString().split('T')[0]}`;
+                } else if (period === "month") {
+                    key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+                } else if (period === "yesterday") {
+                    const yesterday = new Date();
+                    yesterday.setDate(now.getDate() - 1);
+                    if (date.toDateString() !== yesterday.toDateString()) return;
+                    key = "Yesterday";
+                } else if (period === "7days") {
+                    const daysAgo = new Date();
+                    daysAgo.setDate(now.getDate() - 6);
+                    if (date < daysAgo) return;
+                    key = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+                } else if (period === "30days") {
+                    const daysAgo = new Date();
+                    daysAgo.setDate(now.getDate() - 29);
+                    if (date < daysAgo) return;
+                    key = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
+                } else {
+                    key = "Real-Time";
+                }
+
+            if (!salesData[key]) salesData[key] = { sales: 0, orders: 0 };
+            salesData[key].sales += order.totalAmount;
+            salesData[key].orders += 1;
+        });
+
+        const labels = Object.keys(salesData).sort();
+        const sales = labels.map(label => salesData[label].sales);
+        const orders = labels.map(label => salesData[label].orders);
+
+        const ctx = document.getElementById("sales-chart").getContext("2d");
+        if (window.salesChart) window.salesChart.destroy();
+
+        window.salesChart = new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels,
+                    datasets: [
+                        {
+                            label: "Sales",
+                            data: sales,
+                            borderColor: "rgba(75, 192, 192, 1)",
+                            backgroundColor: "rgba(75, 192, 192, 0.2)",
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: "Orders",
+                            data: orders,
+                            borderColor: "rgba(153, 102, 255, 1)",
+                            backgroundColor: "rgba(153, 102, 255, 0.2)",
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: getStepSize(sales),
+                                precision: 0
+                            }
+                        }
+                    }
+                }
+            });
+        document.getElementById("last-updated").textContent = new Date().toLocaleTimeString();
+    }     
+    </script>
+</body>
+</html>

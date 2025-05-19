@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sign Up Page</title>
+  <link rel="stylesheet" href="signup.css">
+  <!-- Firebase UMD Build -->
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="logo">
+      <img src="images/logo433.png" alt="DES403 Logo" class="logo-img">
+      <span class="logo-text"> CSS MALL</span>
+    </div>
+  </nav>
+
+  <!-- Sign Up Section -->
+  <section class="signup-container">
+    <!-- Left Side (Logo) -->
+    <div class="left-side">
+      <img src="images/logo433.png" alt="CSS MALL Logo" class="large-logo">
+      <h2>แหล่งช้อปปิ้งออนไลน์ที่ดีที่สุด</h2>
+    </div>
+
+    <!-- Sign Up Section -->
+    <div class="signup-form">
+      <h2>Sign Up</h2>
+      <form id="signup-form">
+        <label for="name">Username</label>
+        <input type="text" id="name" name="name" placeholder="Enter your full name" required>
+    
+        <label for="email">Email</label>
+        <input type="email" id="email" name="email" placeholder="Enter your email" required>
+    
+        <label for="phoneNumber">Phone Number</label>
+        <input type="tel" id="phoneNumber" name="phoneNumber" placeholder="Enter your phone number" required>
+    
+        <label>Gender</label>
+        <div class="gender-options">
+          <input type="radio" id="male" name="gender" value="male" required>
+          <label for="male">Male</label>
+    
+          <input type="radio" id="female" name="gender" value="female">
+          <label for="female">Female</label>
+    
+          <input type="radio" id="other" name="gender" value="other">
+          <label for="other">Other</label>
+        </div>
+    
+        <label for="dob">Date of Birth</label>
+        <input type="date" id="dob" name="dob" required>
+    
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" placeholder="Create a password" required>
+    
+        <label for="confirm-password">Confirm Password</label>
+        <input type="password" id="confirm-password" name="confirm-password" placeholder="Confirm your password" required>
+    
+        <button type="submit" class="btn-signup">Sign Up</button>
+      </form>
+      <p id="signup-message" style="color: red;"></p>
+      <p>Have an account?<a href="login.html"> Log In</a></p>
+    </div>
+    
+    <style>
+      .gender-options {
+        display: flex;
+        gap: 15px; /* ระยะห่างระหว่าง radio buttons */
+        align-items: center;
+      }
+    </style>    
+  </section>
+
+  <!-- Firebase Configuration and Script -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyCogse_Ke5U0xzdFoiQDv-85AzhMKnieCw",
+      authDomain: "des400-d3feb.firebaseapp.com",
+      projectId: "des400-d3feb",
+      storageBucket: "des400-d3feb.firebasestorage.app",
+      messagingSenderId: "1063674569994",
+      appId: "1:1063674569994:web:525070c6d1500d93a806f3",
+      measurementId: "G-DW42H6ES0R"
+    }; 
+  
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+  
+    // Handle Sign-Up
+    document.getElementById('signup-form').addEventListener('submit', async (e) => {
+      e.preventDefault(); // Prevent default form submission
+  
+      const username = document.getElementById('name').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const phoneNumber = document.getElementById('phoneNumber').value.trim();
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+      const gender = document.querySelector('input[name="gender"]:checked')?.value || "";
+      const dob = document.getElementById('dob').value;
+      const signupMessage = document.getElementById('signup-message');
+  
+      // Clear previous messages
+      signupMessage.innerText = "";
+      signupMessage.style.color = "red";
+  
+      // Validate inputs
+      if (!username || !email || !phoneNumber || !gender || !dob) {
+        signupMessage.innerText = "All fields are required!";
+        return;
+      }
+  
+      if (password.length < 6) {
+        signupMessage.innerText = "Password must be at least 6 characters!";
+        return;
+      }
+  
+      if (password !== confirmPassword) {
+        signupMessage.innerText = "Passwords do not match!";
+        return;
+      }
+  
+      try {
+        // Sign up user
+        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+        const user = userCredential.user;
+  
+        // Save user info to Firestore
+        await db.collection("users").doc(user.uid).set({
+          username: username,
+          email: email,
+          phoneNumber: phoneNumber,
+          gender: gender,
+          dob: dob,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+  
+        signupMessage.style.color = "green";
+        signupMessage.innerText = "Sign-up successful! Redirecting...";
+  
+        // Redirect to home page
+        setTimeout(() => {
+          window.location.href = "home.html";
+        }, 2000);
+  
+      } catch (error) {
+        signupMessage.innerText = error.message;
+        console.error("Error signing up:", error);
+      }
+    });
+  </script>  
+</body>
+</html>

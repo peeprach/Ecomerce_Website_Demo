@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout</title>
+  <link rel="stylesheet" href="checkout.css">
+  
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo" onclick="location.href='home.html'">
+            <img src="../images/logo433.png" alt="CSS MALL" class="logo-img">
+            <span class="logo-text">CSS MALL</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <li><a href="coupon.html">Coupon</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropbtn">My account</a>
+                <div class="dropdown-content">
+                  <a href="acc.html">My Profile</a>
+                  <a href="myshop.html">My Shop</a>
+                </div>
+            </li>  
+            <li>
+                <a href="cart.html">
+                    <img src="images/shopping-cart.png" alt="Cart" class="cart-icon">
+                </a>
+            </li> 
+            <li><a href="login.html" id="logout-btn">Logout</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        <h1 style="margin-left: 20vh;">Checkout</h1>
+
+        <!-- Delivery Address -->
+        <section id="delivery-address" class="box">
+            <h2>📍 Delivery Address</h2>
+            <div id="address-container">
+                <p style="color: gray;">Loading address...</p>
+            </div>
+        </section>
+
+        <div id="address-popup" class="popup">
+            <div class="popup-content">
+                <h2>New Address</h2>
+        
+                <label for="full-name">Full Name</label>
+                <input type="text" id="full-name" placeholder="Full Name">
+        
+                <label for="phone">Phone Number</label>
+                <input type="text" id="phone" placeholder="Phone Number">
+        
+                <label for="location">Province, District, Sub District, Postal Code</label>
+                <input type="text" id="location" placeholder="Province, District, Sub District, Postal Code">
+        
+                <label for="street">Street Name, Building, House No.</label>
+                <input type="text" id="street" placeholder="Street Name, Building, House No.">
+        
+                <button id="add-location">+ Add Location</button>
+    
+                <div class="popup-actions" style="display: flex; gap: 50px; margin-top: 20px;">
+                    <button id="close-popup">Cancel</button>
+                    <button id="save-address" class="submit-btn">Submit</button>
+                </div>
+            </div>
+        </div>        
+
+        <!-- Order Summary -->
+        <section id="order-summary" class="box">
+            <h2>📦 Products Ordered</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Product</th><th>Price</th><th>Quantity</th><th>Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody id="order-items"></tbody>
+            </table>
+        </section>
+
+        <!-- Payment Method -->
+        <section id="payment-method" class="box">
+            <h2>💳 Payment Method</h2>
+            <label><input type="radio" name="payment" value="cod" checked> Cash on Delivery</label>
+            <label><input type="radio" name="payment" value="qr"> QR Code</label>
+            <label><input type="radio" name="payment" value="credit"> Credit Card</label>
+        </section>
+
+        <!-- Order Total -->
+        <section id="order-total" class="box">
+            <p>Shipping: ฿29</p>
+            <h3>Order Total: <span class="total-price">฿0</span></h3>
+            <button id="place-order">Place Order</button>
+        </section>
+    </main>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCogse_Ke5U0xzdFoiQDv-85AzhMKnieCw",
+            authDomain: "des400-d3feb.firebaseapp.com",
+            projectId: "des400-d3feb",
+            storageBucket: "des400-d3feb.appspot.com",
+            messagingSenderId: "1063674569994",
+            appId: "1:1063674569994:web:525070c6d1500d93a806f3",
+            measurementId: "G-DW42H6ES0R"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const orderItemsContainer = document.getElementById('order-items');
+            const totalPriceElement = document.querySelector('.total-price');
+            const addressContainer = document.getElementById('address-container');
+            const popup = document.getElementById('address-popup');
+
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            let total = 0;
+            let subtotal = 0;
+            let shippingCost = 29; // ✅ ค่าจัดส่ง
+                
+            orderItemsContainer.innerHTML = '';
+            cart.forEach(item => {
+                let row = `<tr>
+                    <td><img src="${item.image}" class="product-img"> ${item.name}</td>
+                    <td>฿${item.price}</td>
+                    <td>${item.quantity}</td>
+                    <td>฿${item.price * item.quantity}</td>
+                </tr>`;
+                orderItemsContainer.innerHTML += row;
+                total += item.price * item.quantity;
+            });
+
+            total += 29;
+            totalPriceElement.textContent = `฿${total}`;
+
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    const userRef = db.collection('users').doc(user.uid);
+                    const doc = await userRef.get();
+
+                    if (doc.exists && doc.data().address) {
+                        const { phone, address } = doc.data();
+                        addressContainer.innerHTML = `
+                            <p>${phone}</p>
+                            <p>${address}</p>
+                            <button id="change-address">Change</button>
+                        `;
+                        document.getElementById('change-address').addEventListener('click', openPopup);
+                    } else {
+                        addressContainer.innerHTML = '<button id="add-address">+ Add Address</button>';
+                        document.getElementById('add-address').addEventListener('click', openPopup);
+                    }
+                }
+            });
+
+            document.getElementById('place-order').addEventListener('click', () => {
+                alert('Order placed successfully!');
+                localStorage.removeItem('cart');
+                window.location.href = 'home.html';
+            });
+        });
+
+        //popup
+        function openPopup() {
+            document.getElementById('address-popup').style.display = 'block';
+        }
+        
+        document.getElementById('close-popup').addEventListener('click', () => {
+            document.getElementById('address-popup').style.display = 'none';
+        });
+        
+        document.getElementById('save-address').addEventListener('click', async () => {
+            const phone = document.getElementById('phone').value;
+            const location = document.getElementById('location').value;
+            const street = document.getElementById('street').value;
+            const user = auth.currentUser;
+
+            if (user && phone && location && street) {
+                // บันทึกข้อมูลลง Firestore
+                await db.collection('users').doc(user.uid).set({
+                    phone, 
+                    address: `${location}, ${street}`
+                }, { merge: true });
+
+                // อัปเดตที่อยู่บนหน้าเว็บทันที
+                document.getElementById('address-container').innerHTML = `
+                    <p>${phone}</p>
+                    <p>${location}, ${street}</p>
+                    <button id="change-address">Change</button>
+                `;
+
+                // ปิด popup
+                document.getElementById('address-popup').style.display = 'none';
+
+                // เพิ่ม event ให้ปุ่ม Change
+                document.getElementById('change-address').addEventListener('click', openPopup);
+
+            } else {
+                alert("Please fill all fields!");
+            }
+        });
+
+        async function addNewAddress() {
+            const name = prompt("Enter your name:");
+            const phone = prompt("Enter your phone number:");
+            const address = prompt("Enter your full address:");
+
+            if (name && phone && address) {
+                const user = auth.currentUser;
+                if (user) {
+                    await db.collection('users').doc(user.uid).set({ name, phone, address }, { merge: true });
+                    alert("Address saved successfully!");
+                    location.reload();
+                }
+            } else {
+                alert("Please fill all fields!");
+            }
+        }
+    </script>
+</body>
+</html>

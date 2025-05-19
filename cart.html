@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart</title>
+    <link rel="stylesheet" href="cart.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+          <img src="images/logo433.png" alt="DES403 Logo" class="logo-img">
+          <span class="logo-text"> CSS MALL</span>
+        </div>
+        <ul class="nav-links">
+          <li><a href="home.html" class="active">Home</a></li>
+          <li><a href="shop.html">Shop</a></li>
+          <li><a href="coupon.html">Coupon</a></li>
+          <li class="dropdown">
+            <a href="#" class="dropbtn">My account</a>
+            <div class="dropdown-content">
+              <a href="acc.html">My Profile</a>
+              <a href="myshop.html">My Shop</a>
+              <a href="login.html" id="logout-btn" class="logout-btn">Logout</a>
+            </div>
+          </li> 
+          <li>
+            <a href="cart.html">
+                <img src="images/shopping-cart.png" alt="Cart" class="cart-icon">
+            </a>
+          </li>  
+        </ul>
+      </nav>
+
+    <header class="hero-section">
+        <div class="hero-content">
+            <h1>Shopping Cart</h1>
+            <p>Home > Cart</p>
+        </div>
+    </header>
+
+    <main>
+        <table class="cart-table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Price</th>
+                    <th>Quantity</th>
+                    <th>Subtotal</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="cart-items">
+                <!-- Items will be dynamically inserted here -->
+            </tbody>
+        </table>
+
+        <div class="cart-total">
+            <p>Total: <span id="cart-total">฿0</span></p>
+            <button class="checkout-btn">Proceed to Checkout</button>
+        </div>
+    </main>
+
+    <footer>
+        <p style="text-align: center;">CSS493 Computer Engineering Project</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+        const cartItemsContainer = document.getElementById('cart-items');
+        const cartTotalContainer = document.getElementById('cart-total');
+        const cartCount = document.getElementById('cart-count'); // ดึงตัวแสดงจำนวนสินค้า
+
+        // Retrieve cart items from localStorage
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        // Function to update the total price
+        function updateCartCount() {
+            let totalQuantity = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.innerText = totalQuantity;
+            cartCount.style.display = totalQuantity > 0 ? "inline-block" : "none"; // ซ่อนไอคอนถ้าค่าเป็น 0
+        }
+        // 🔹 ฟังก์ชันอัปเดตราคาทั้งหมด
+        function updateTotal() {
+            let total = cart.reduce((sum, item) => sum + parseFloat(item.price.replace('฿', '').trim()) * item.quantity, 0);
+            cartTotalContainer.innerText = '฿' + total.toFixed(2);
+        }
+
+
+        // Function to update cart items in the table
+        function updateCartTable() {
+            cartItemsContainer.innerHTML = '';
+            cart.forEach((item, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>
+                        <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+                        <p>${item.name}</p>
+                    </td>
+                    <td>${item.price}</td>
+                    <td>
+                        <button class="decrease-quantity" data-index="${index}">-</button>
+                        <input type="number" class="quantity-input" value="${item.quantity}" min="1" data-index="${index}">
+                        <button class="increase-quantity" data-index="${index}">+</button>
+                    </td>
+                    <td>฿${(parseFloat(item.price.replace('฿', '').trim()) * item.quantity).toFixed(2)}</td>
+                    <td><button class="remove-item" data-index="${index}">Remove</button></td>
+                `;
+                cartItemsContainer.appendChild(row);
+            });
+
+            // Update the total after updating the table
+            updateTotal();
+            updateCartCount(); // ✅ อัปเดตจำนวนสินค้าในไอคอน
+        }
+
+        // Event listener to increase quantity สำหรับเพิ่ม/ลด/ลบสินค้า
+        cartItemsContainer.addEventListener('click', (e) => {
+            const index = e.target.getAttribute('data-index');
+
+            if (e.target.classList.contains('increase-quantity')) {
+                cart[index].quantity += 1;
+            } else if (e.target.classList.contains('decrease-quantity') && cart[index].quantity > 1) {
+                cart[index].quantity -= 1;
+            } else if (e.target.classList.contains('remove-item')) {
+                cart.splice(index, 1);
+            }
+
+            localStorage.setItem('cart', JSON.stringify(cart));
+            updateCartTable();
+        });
+
+        // 🔹 Event listener เมื่อมีการแก้ไขจำนวนสินค้าด้วย input
+        cartItemsContainer.addEventListener('input', (e) => {
+            if (e.target.classList.contains('quantity-input')) {
+                const index = e.target.getAttribute('data-index');
+                const newQuantity = parseInt(e.target.value);
+                if (newQuantity >= 1) {
+                    cart[index].quantity = newQuantity;
+                    localStorage.setItem('cart', JSON.stringify(cart));
+                    updateCartTable();
+                } else {
+                    e.target.value = cart[index].quantity;
+                }
+            }
+        });
+
+        // 🔹 โหลดค่าตะกร้าเมื่อเปิดหน้าเว็บ
+        updateCartTable();
+
+        document.querySelector('.checkout-btn').addEventListener('click', () => {
+            window.location.href = 'checkout.html';
+        });
+    });
+    </script>
+</body>
+</html>

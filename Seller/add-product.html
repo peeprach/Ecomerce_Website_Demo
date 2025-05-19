@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Add Product</title>
+  <link rel="stylesheet" href="seller.css">
+</head>
+<body>
+
+  <nav class="navbar">
+    <div class="logo">
+      <img src="../images/logo433.png" alt="CSS MALL Logo" class="logo-img">
+      <span class="logo-text">CSS MALL</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="../home.html">Home</a></li>
+      <li><a href="../shop.html">Shop</a></li>
+      <li><a href="../Seller/seller.html">Seller Dashboard</a></li>
+    </ul>
+  </nav>
+
+  <div class="add-product-container">
+    <h2>Add New Product</h2>
+    <form id="add-product-form">
+
+      <!-- Product Type -->
+      <label>Product Type</label>
+      <div class="product-type-container">
+        <div class="product-type" data-value="simple" onclick="selectProductType(this)">Simple Product</div>
+        <div class="product-type" data-value="group" onclick="selectProductType(this)">Group Product</div>
+      </div>
+      <input type="hidden" id="product-type" value="simple">
+
+      <!-- Product Info -->
+      <div class="form-group">
+        <h3>Product Infomation</h3>
+        <label>Product Name</label>
+        <input type="text" id="product-name" required>
+      </div>
+
+      <div class="form-group">
+        <label>Product Short Description</label>
+        <textarea id="short-desc" required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Product Details</label>
+        <textarea id="detail" required></textarea>
+      </div>
+
+      <!-- Tags Setting -->
+      <div class="form-group">
+        <h3>Tags Setting</h3>
+        <label>Tags</label>
+        <input type="text" id="tags" placeholder="e.g., Electronics, Fashion">
+      </div>
+
+      <!-- Product & Stock -->
+      <div class="form-group">
+        <h3>Product & Stock</h3>
+        <label>SKU:</label>
+        <input type="text" id="sku" required>
+      </div>
+
+      <div class="form-group">
+        <label>Price ($):</label>
+        <input type="number" id="price" required>
+      </div>
+
+      <div class="form-group">
+        <label>Product Image:</label>
+        <button type="button" onclick="chooseImage()">Add Image</button>
+      </div>
+
+      <div class="form-group">
+        <label>Category:</label>
+        <select id="category">
+          <option value="clothing">Clothing</option>
+          <option value="shoes">Shoes</option>
+          <option value="accessories">Accessories</option>
+          <option value="add-new">+ Create Category</option>
+        </select>
+        <input type="text" id="newCategory" placeholder="Enter new category" style="display: none;">
+      </div>
+
+      <!-- Product Brand -->
+      <div class="form-group">
+        <label>Brand:</label>
+        <select id="brand" onchange="handleBrandChange()">
+          <option value="no-brand">No Brand</option>
+          <option value="adidas">Adidas</option>
+          <option value="nike">Nike</option>
+          <option value="puma">Puma</option>
+          <option value="add-new">+ Add New Brand</option>
+        </select>
+        <input type="text" id="newBrand" placeholder="Enter new brand" style="display: none;">
+      </div>
+
+      <!-- Verify -->
+      <div class="form-group">
+        <label>Verify:</label>
+        <select id="verify">
+          <option value="no">No</option>
+          <option value="yes">Yes</option>
+        </select>
+      </div>
+
+      <button type="submit">Submit Product</button>
+    </form>
+  </div>
+
+  <script>
+    function selectProductType(element) {
+      document.querySelectorAll('.product-type').forEach(el => el.classList.remove('selected'));
+      element.classList.add('selected');
+      document.getElementById('product-type').value = element.getAttribute('data-value');
+    }
+
+    function handleBrandChange() {
+      const brandSelect = document.getElementById("brand");
+      const newBrandInput = document.getElementById("newBrand");
+
+      if (brandSelect.value === "add-new") {
+        newBrandInput.style.display = "inline-block";
+      } else {
+        newBrandInput.style.display = "none";
+        newBrandInput.value = "";
+      }
+    }
+
+    function chooseImage() {
+      alert("Choose an image from Gallery or Take a Photo");
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banks & Cards</title>
+    <link rel="stylesheet" href="../customer/bank.css">
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+          <img src="../images/logo433.png" alt="DES403 Logo" class="logo-img">
+          <span class="logo-text"> CSS MALL</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="../home.html">Home</a></li>
+            <li><a href="../shop.html">Shop</a></li>
+            <li><a href="../coupon.html">Coupon</a></li>
+          <li class="dropdown">
+            <a href="#" class="dropbtn">My account</a>
+            <div class="dropdown-content">
+              <a href="../acc.html">My Profile</a>
+              <a href="../myshop.html">My Shop</a>
+              <a href="../login.html" id="logout-btn" class="logout-btn">Logout</a>
+            </div>
+          </li> 
+          <li>
+            <a href="cart.html">
+                <img src="../images/shopping-cart.png" alt="Cart" class="cart-icon">
+            </a>
+          </li>  
+        </ul>
+      </nav>
+
+    <!-- Account Section -->
+    <div class="container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="profile-section">
+                <label for="profile-pic-input">
+                    <img id="profile-pic" src="/images/user-pro.png" alt="Profile Picture" class="profile-pic">
+                </label>
+                <button class="edit-profile" onclick="uploadProfilePicture()">Edit Profile</button>
+                <input type="file" id="profile-pic-input" accept="image/*" style="display: none;">
+            </div>
+    
+            <nav class="menu">
+                <ul>
+                    <li id="account-menu">
+                        <a href="#" onclick="toggleSubmenu(event)">
+                            <img src="../images/user.png" class="icon"> My Account
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="../acc.html" >Profile</a></li>
+                            <li><a href="../customer/bank.html">Banks & Cards</a></li>
+                            <li><a href="../customer/address.html">Addresses</a></li>
+                            <li><a href="#">Change Password</a></li>
+                            <li><a href="#">Privacy Settings</a></li>
+                            <li><a href="#">Notification Settings</a></li>
+                        </ul>
+                    </li>                    
+                    <li><a href="#" style="margin-top: 10px;"><img src="../images/purchase.png" class="icon"> My Purchase</a></li>
+                    <li><a href="#"><img src="../images/notic.png" class="icon"> Notification</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <h2>Credit / Debit Card</h2>
+            <p class="profile-subtitle">These cards will be displayed when you purchase using Credit/Debit Card.</p>
+
+            <div id="loading">Loading...</div>
+            <div id="card-content" style="display: none;">
+                <div id="card-list"></div>
+                <button id="add-new-card" onclick="showCardForm()">+ Add New Card</button>
+            </div>
+
+            <div id="card-form" style="display: none;">
+                <h3>Add New Credit Card</h3>
+                <input type="text" id="card-number" placeholder="Card Number" maxlength="16" required>
+                <input type="text" id="card-holder" placeholder="Cardholder Name" required>
+                <input type="text" id="expiry-date" placeholder="MM/YY" maxlength="5" required>
+                <input type="password" id="cvv" placeholder="CVV" maxlength="3" required>
+                <button onclick="saveCard()">Save Card</button>
+                <button onclick="hideCardForm()">Cancel</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCogse_Ke5U0xzdFoiQDv-85AzhMKnieCw",
+            authDomain: "des400-d3feb.firebaseapp.com",
+            projectId: "des400-d3feb",
+            storageBucket: "des400-d3feb.appspot.com",
+            messagingSenderId: "1063674569994",
+            appId: "1:1063674569994:web:525070c6d1500d93a806f3",
+            measurementId: "G-DW42H6ES0R"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        function loadCards(user) {
+            if (!user) {
+                document.getElementById("loading").innerText = "Please log in to view your cards.";
+                return;
+            }
+
+            const cardListContainer = document.getElementById('card-list');
+            cardListContainer.innerHTML = "";
+            db.collection("users").doc(user.uid).collection("cards").onSnapshot(snapshot => {
+                cardListContainer.innerHTML = "";
+                if (snapshot.empty) {
+                    cardListContainer.innerHTML = "<p>You don't have any cards yet.</p>";
+                } else {
+                    snapshot.docs.forEach(doc => {
+                        const card = doc.data();
+                        const cardElement = document.createElement("div");
+                        cardElement.innerHTML = `<div>Card: **** **** **** ${card.cardNumber.slice(-4)}</div>`;
+                        cardListContainer.appendChild(cardElement);
+                    });
+                }
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("card-content").style.display = "block";
+            }, error => {
+                console.error("Error fetching cards:", error);
+            });
+        }
+
+        auth.onAuthStateChanged(user => {
+            loadCards(user);
+        });
+
+        function showCardForm() {
+            document.getElementById("card-form").style.display = "block";
+        }
+
+        function hideCardForm() {
+            document.getElementById("card-form").style.display = "none";
+        }
+
+        function saveCard() {
+            const user = auth.currentUser;
+            if (!user) {
+                alert("Please log in first!");
+                return;
+            }
+
+            const cardNumber = document.getElementById("card-number").value;
+            const cardHolder = document.getElementById("card-holder").value;
+            const expiryDate = document.getElementById("expiry-date").value;
+            const cvv = document.getElementById("cvv").value;
+
+            if (cardNumber.length !== 16 || cvv.length !== 3 || !expiryDate.match(/^(0[1-9]|1[0-2])\/([0-9]{2})$/)) {
+                alert("Please enter valid card details.");
+                return;
+            }
+
+            db.collection("users").doc(user.uid).collection("cards").add({
+                cardNumber: cardNumber,
+                cardHolder: cardHolder,
+                expiryDate: expiryDate,
+                addedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }).then(() => {
+                alert("Card added successfully!");
+                hideCardForm();
+            }).catch(error => {
+                console.error("Error adding card:", error);
+                alert("Failed to add card.");
+            });
+        }
+    </script>
+</body>
+</html>

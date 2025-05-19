@@ -1,0 +1,284 @@
+/* General Reset */
+body, html {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+  font-weight: bolder;
+}
+
+/* Navigation Bar */
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  background-color: #fff;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+  
+.cart-icon {
+  width: 24px; /* ขนาดของไอคอนรถเข็น */
+  height: auto;
+  vertical-align: middle;
+  position: relative; /* ทำให้ cart-count ตำแหน่งสัมพันธ์กับ cart-icon */
+  margin-top: -5px;
+}
+
+.cart-count {
+  position: absolute; /* ทำให้ตำแหน่งไม่ขึ้นอยู่กับ flow ของหน้า */
+  top: 25px; /* เลื่อนขึ้นจากขอบบนของ cart-icon */
+  right: 115px; /* เลื่อนขวาจากขอบขวาของ cart-icon */
+  width: 18px; /* ขนาดของวงกลม */
+  height: 18px; /* ขนาดของวงกลม */
+  background-color: red; /* สีพื้นหลังของวงกลม */
+  color: white;
+  border-radius: 50%; /* ทำให้เป็นวงกลม */
+  font-size: 12px; /* ขนาดตัวเลข */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  text-align: center;
+}
+  
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 20px; /* ปรับระยะห่าง */
+  }
+  
+  .logo img {
+    height: 40px;
+    width: auto;
+  }
+
+  .logo-text {
+    font-size: 18px;
+    font-weight: bold;
+    color: #232323;
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding-left: 20px; /* เพิ่มช่องว่างระหว่างเส้นกับข้อความ */
+  }
+  
+  .logo-text::before {
+    content: "";
+    display: inline-block;
+    width: 2px; /* ความกว้างของเส้น */
+    height: 30px; /* ความยาวของเส้น */
+    background-color: #aaa; /* สีของเส้น */
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .nav-links {
+    display: flex;
+    list-style: none;
+    gap: 40px;
+  }
+  
+  .nav-links li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 600;
+  }
+  
+  .nav-links li a.active {
+    color: #ffc107;
+  }
+  
+  /* Hero Section */
+.hero-section {
+    background: url('../images/shop-background.jpg') no-repeat center center/cover;
+    color: #232323;
+    text-align: center;
+    padding: 150px 0;
+    position: relative;
+  }
+  
+  .hero-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+  }
+  
+  
+  .hero-content h1 {
+    font-size: 48px;
+    margin: 0;
+    font-weight: bold;
+  }
+  
+  .hero-content p {
+    font-size: 18px;
+    margin-top: 10px;
+  }
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    background-color: #333;
+    color: white;
+}
+
+.back-button {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+main {
+    max-width: 800px;
+    margin: 20px auto;
+    background: white;
+    padding: 20px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.cart-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.cart-table th, .cart-table td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+  text-align: center;
+}
+
+
+.cart-table input {
+    width: 50px;
+    text-align: center;
+}
+
+.cart-summary {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.checkout-btn, .remove-btn {
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.checkout-btn {
+    background: green;
+    color: white;
+}
+
+.remove-btn {
+    background: red;
+    color: white;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.cart-item img {
+  width: 100px;
+  height: 100px;
+  margin-right: 20px;
+}
+
+.item-details h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.item-details p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+/* ปรับขนาดรูปในตารางสินค้า */
+.cart-table img {
+  width: 60px; /* ปรับขนาดภาพให้เล็กลง เช่น 60px */
+  height: auto; /* ให้ความสูงปรับอัตโนมัติ */
+}
+
+/* จัดให้ total และปุ่ม checkout อยู่ข้างๆ กัน */
+.cart-total {
+    display: flex;
+    justify-content: space-between; /* ให้ช่องว่างระหว่าง total กับปุ่ม checkout */
+    align-items: center;
+    margin-top: 20px;
+}
+
+.cart-total p {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+.checkout-btn {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    border-radius: 0px;
+}
+
+/* Dropdown container */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown button style */
+.dropbtn {
+  color: white;
+  text-decoration: none;
+  display: inline-block;
+}
+
+/* Dropdown content (hidden by default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f9f9f9;
+  min-width: 160px;
+  box-shadow: 0px 12px 16px rgba(0,0,0,0.2);
+  z-index: 1;
+  font-size: 14px;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+.dropdown-content a:hover {
+  background-color: #f9f9f9; /* หรือไม่ต้องใส่ก็ได้ */
+  color: #ffc107;
+}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+/* Optional: highlight dropdown button on hover */
+.dropdown:hover .dropbtn {
+  background-color: #dbdbdb;
+}
+
+.dropdown-content a:active {
+  background-color: #ffc107;
+  color: white;
+}

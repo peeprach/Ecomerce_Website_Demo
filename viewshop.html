@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>View Shop</title>
+    <link rel="stylesheet" href="viewshop.css"/>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-storage-compat.js"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+        <img src="images/logo433.png" alt="DES403 Logo" class="logo-img" />
+        <span class="logo-text">CSS MALL</span>
+        </div>
+            <ul class="nav-links">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <li><a href="coupon.html">Coupon</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropbtn">My Account</a>
+                <div class="dropdown-content">
+                    <a href="acc.html">My Profile</a>
+                    <a href="myshop.html" class="active">My Shop</a>
+                    <a href="#" id="logout-btn">Logout</a>
+                </div>
+            </li>
+            <li>
+                <a href="cart.html">
+                <img src="images/shopping-cart.png" alt="Cart" class="cart-icon" />
+                </a>
+            </li>
+        </ul>
+    </nav>
+    
+    <main>
+        <section class="shop-section">
+            <div class="shop-header">
+                <h1 id="shop-name">Shop Name</h1>
+                <div class="shop-meta">
+                <span>⭐ N/A</span> |
+                <span id="follower-count">0 followers</span>
+                </div>
+            </div>
+        </section>
+      
+        <hr />
+      
+        <section class="product-section">
+            <div class="product-header">
+                <h2>My Products</h2>
+                <a href="add-product.html" class="add-product-btn">+ Add New Product</a>
+            </div>
+          
+            <div id="product-container" class="product-list">
+              <!-- Products will be shown here -->
+            </div>
+            <p id="no-products" class="no-products">No more product found.</p>
+        </section>
+    </main>
+      
+
+    <script>
+        const firebaseConfig = {
+        apiKey: "AIzaSyCogse_Ke5U0xzdFoiQDv-85AzhMKnieCw",
+        authDomain: "des400-d3feb.firebaseapp.com",
+        projectId: "des400-d3feb",
+        storageBucket: "des400-d3feb.appspot.com",
+        messagingSenderId: "1063674569994",
+        appId: "1:1063674569994:web:525070c6d1500d93a806f3",
+        measurementId: "G-DW42H6ES0R"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        auth.onAuthStateChanged(async (user) => {
+        if (!user) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        const userDoc = await db.collection("users").doc(user.uid).get();
+        const userData = userDoc.data();
+        document.getElementById("shop-name").textContent = userData.name || "My Shop";
+
+        // Load followers count
+        const followersSnap = await db.collection("follows")
+            .where("shopId", "==", user.uid).get();
+        document.getElementById("follower-count").textContent =
+            `${followersSnap.size} followers`;
+
+        // Load products
+        const productsSnap = await db.collection("products")
+            .where("sellerId", "==", user.uid).get();
+
+        const productContainer = document.getElementById("product-container");
+        const noProductsText = document.getElementById("no-products");
+
+        if (productsSnap.empty) {
+            noProductsText.style.display = "block";
+        } else {
+            noProductsText.style.display = "none";
+            productsSnap.forEach(doc => {
+            const product = doc.data();
+            const div = document.createElement("div");
+            div.classList.add("product-card");
+            div.innerHTML = `
+                <h3>${product.name}</h3>
+                <p>Price: $${product.price}</p>
+            `;
+            productContainer.appendChild(div);
+            });
+        }
+        });
+    </script>
+</body>
+</html>

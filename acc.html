@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Page</title>
+  <link rel="stylesheet" href="acc.css">
+  <!-- Firebase UMD Build -->
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-storage-compat.js"></script>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="logo">
+            <img src="images/logo433.png" alt="DES403 Logo" class="logo-img">
+            <span class="logo-text"> CSS MALL</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="home.html" class="active">Home</a></li>
+            <li><a href="shop.html">Shop</a></li>
+            <li><a href="coupon.html">Coupon</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropbtn">My account</a>
+                <div class="dropdown-content">
+                <a href="acc.html">My Profile</a>
+                <a href="myshop.html">My Shop</a>
+                <a href="login.html" id="logout-btn" class="logout-btn">Logout</a>
+                </div>
+            </li> 
+            <li>
+                <a href="cart.html">
+                    <img src="images/shopping-cart.png" alt="Cart" class="cart-icon">
+                </a>
+            </li>  
+        </ul>
+    </nav>
+
+    <!-- Account Section -->
+    <div class="container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="profile-section">
+                <label for="profile-pic-input">
+                    <img id="profile-pic" src="/images/user-pro.png" alt="Profile Picture" class="profile-pic">
+                </label>
+                <button class="edit-profile" onclick="uploadProfilePicture()">Edit Profile</button>
+                <input type="file" id="profile-pic-input" accept="image/*" style="display: none;">
+            </div>
+    
+            <nav class="menu">
+                <ul>
+                    <li id="account-menu">
+                        <a href="#" onclick="toggleSubmenu(event)">
+                            <img src="images/user.png" class="icon"> My Account
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="acc.html" >Profile</a></li>
+                            <li><a href="../customer/bank.html">Banks & Cards</a></li>
+                            <li><a href="../customer/address.html">Addresses</a></li>
+                            <li><a href="#">Change Password</a></li>
+                            <li><a href="#">Privacy Settings</a></li>
+                            <li><a href="#">Notification Settings</a></li>
+                        </ul>
+                    </li>                    
+                    <li><a href="#" style="margin-top: 10px;"><img src="images/purchase.png" class="icon"> My Purchase</a></li>
+                    <li><a href="#"><img src="images/notic.png" class="icon"> Notification</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <h2>My Profile</h2>
+            <p class="profile-subtitle" style="font-weight: 300;">Manage and protect your account</p>
+
+            <div id="loading" style="display: block;">Loading...</div> <!-- Loading message -->
+
+            <div id="profile-content" style="display: none;"> <!-- Profile content -->
+                <form class="profile-form">
+                    <div class="profile-row">
+                        <div class="profile-field">
+                            <label>Username:</label>
+                            <input type="text" id="username" disabled style="pointer-events: none; background-color: transparent; border: none; outline: none;">
+                        </div>                    
+                
+                        <div class="profile-field">
+                            <label>Name:</label>
+                            <input type="text" id="name" placeholder="Enter your name" style="padding: 10px 200px 10px 10px;">
+                        </div>
+                    </div>
+                
+                    <div class="profile-row">
+                        <div class="profile-field">
+                            <label>Email:</label>
+                            <input type="email" id="email" readonly>
+                            <button type="button" class="change-btn" onclick="verifyBeforeEdit('email')">Change</button>
+                        </div>
+                
+                        <div class="profile-field">
+                            <label>Phone:</label>
+                            <input type="tel" id="phoneNumber" readonly>
+                            <button type="button" class="change-btn" onclick="verifyBeforeEdit('phoneNumber')">Change</button>
+                        </div>
+                    </div>
+                
+                    <div class="profile-row">
+                        <div class="profile-field">
+                            <label>Gender:</label>
+                            <input type="radio" name="gender" value="male"> Male
+                            <input type="radio" name="gender" value="female"> Female
+                            <input type="radio" name="gender" value="female"> Other
+                        </div>
+                
+                        <div class="profile-field">
+                            <label>Date of Birth:</label>
+                            <input type="date" id="dob" readonly>
+                            <button type="button" class="change-btn" onclick="enableEdit('dob')">Change</button>
+                        </div>
+                    </div>
+                
+                    <button type="submit" class="save-btn">Save</button>
+                </form>            
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyCogse_Ke5U0xzdFoiQDv-85AzhMKnieCw",
+            authDomain: "des400-d3feb.firebaseapp.com",
+            projectId: "des400-d3feb",
+            storageBucket: "des400-d3feb.appspot.com",
+            messagingSenderId: "1063674569994",
+            appId: "1:1063674569994:web:525070c6d1500d93a806f3",
+            measurementId: "G-DW42H6ES0R"
+        };
+    
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storageRef = firebase.storage().ref(); // Initialize Firebase storage reference
+    
+        let isDataLoaded = false; // Track data loading status
+    
+        auth.onAuthStateChanged(async (user) => {
+            if (user) {
+                try {
+                    const userDoc = await db.collection("users").doc(user.uid).get();
+                    if (userDoc.exists) {
+                        const data = userDoc.data();
+                        document.getElementById("username").value = data.username || "N//A";
+                        document.getElementById("name").value = data.name || "";
+                        document.getElementById("email").value = maskEmail(data.email || "N/A");
+                        document.getElementById("phoneNumber").value = maskPhone(data.phoneNumber || "N/A");
+                        document.getElementById("dob").value = data.dob || "";
+    
+                        if (data.gender) {
+                            document.querySelector(`input[name="gender"][value="${data.gender}"]`).checked = true;
+                        }
+    
+                        if (data.profilePic) {
+                            document.getElementById("profile-pic").src = data.profilePic;
+                        }
+    
+                        isDataLoaded = true; // Mark as data loaded
+                    }
+                } catch (error) {
+                    console.error("Error fetching user data: ", error);
+                }
+            } else {
+                window.location.href = "signup.html";
+            }
+        });
+    
+        // Wait for data to be loaded, then display the profile content
+        function checkDataLoaded() {
+            if (isDataLoaded) {
+                document.getElementById("loading").style.display = "none";
+                document.getElementById("profile-content").style.display = "block";
+            } else {
+                setTimeout(checkDataLoaded, 100); // Retry if not loaded
+            }
+        }
+        checkDataLoaded(); // Start checking for data
+    
+        document.querySelector(".profile-form").addEventListener("submit", async (event) => {
+            event.preventDefault(); // Prevent page reload
+
+            const user = auth.currentUser;
+            if (user) {
+                const updatedData = {
+                    name: document.getElementById("name").value.trim(),
+                    phoneNumber: document.getElementById("phoneNumber").value.trim(),
+                    dob: document.getElementById("dob").value.trim(),
+                    gender: document.querySelector('input[name="gender"]:checked')?.value || ""
+                };
+
+                try {
+                    await db.collection("users").doc(user.uid).update(updatedData);
+                    alert("Profile updated successfully!");
+                    document.getElementById("name").setAttribute("readonly", true);
+                    document.getElementById("phoneNumber").setAttribute("readonly", true);
+                    document.getElementById("dob").setAttribute("readonly", true);
+                } catch (error) {
+                    console.error("Error updating profile: ", error);
+                    alert("Failed to update profile.");
+                }
+            }
+        });
+
+        // Enable edit for fields like email, phone number, etc.
+        function enableEdit(fieldId) {
+            const inputField = document.getElementById(fieldId);
+            if (inputField) {
+                inputField.removeAttribute("readonly");
+                inputField.focus();
+            }
+        }
+
+        // Mask email and phone
+        function maskEmail(email) {
+            const [localPart, domain] = email.split("@");
+            if (!localPart || !domain) return email;
+            return `${localPart.slice(0, 2)}${"*".repeat(localPart.length - 2)}@${domain}`;
+        }
+
+        function maskPhone(phone) {
+            if (phone.length < 4) return phone;
+            return `${"*".repeat(phone.length - 4)}${phone.slice(-4)}`;
+        }
+
+        // Verify password before allowing edits
+        async function verifyBeforeEdit(fieldId) {
+            const user = auth.currentUser;
+            if (!user) {
+                alert("User not authenticated");
+                return;
+            }
+
+            const password = prompt("Enter your password to continue:");
+            if (!password) return;
+
+            const credential = firebase.auth.EmailAuthProvider.credential(user.email, password);
+
+            try {
+                await user.reauthenticateWithCredential(credential);
+                enableEdit(fieldId);
+            } catch (error) {
+                alert("Incorrect password. Please try again.");
+                console.error("Reauthentication failed:", error);
+            }
+        }
+
+        // Upload profile picture
+        document.getElementById("profile-pic-input").addEventListener("change", async function(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const user = auth.currentUser;
+            if (!user) {
+                alert("Please log in first!");
+                return;
+            }
+
+            const fileRef = storageRef.child(`profile_pictures/${user.uid}`);
+            
+            try {
+                const snapshot = await fileRef.put(file);
+                const downloadURL = await snapshot.ref.getDownloadURL();
+
+                await db.collection("users").doc(user.uid).update({
+                    profilePic: downloadURL
+                });
+
+                document.getElementById("profile-pic").src = downloadURL;
+                alert("Profile picture updated successfully!");
+            } catch (error) {
+                console.error("Error uploading profile picture:", error);
+                alert("Failed to upload profile picture.");
+            }
+        });
+    
+        function uploadProfilePicture() {
+            document.getElementById("profile-pic-input").click(); // Open file picker
+        }
+
+        // Submenu toggle
+        function toggleSubmenu(event) {
+            event.preventDefault();
+            const submenu = document.querySelector("#account-menu .submenu");
+            submenu.classList.toggle("show");
+        }
+    </script>
+</body>
+</html>

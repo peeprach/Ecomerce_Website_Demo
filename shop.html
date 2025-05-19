@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shop Page</title>
+  <link rel="stylesheet" href="shop.css">
+</head>
+<body>
+  <!-- Navigation Bar -->
+  <nav class="navbar">
+    <div class="logo">
+      <img src="images/logo433.png" alt="DES403 Logo" class="logo-img">
+      <span class="logo-text"> CSS MALL</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="home.html" class="active">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="coupon.html">Coupon</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropbtn">My account</a>
+        <div class="dropdown-content">
+          <a href="acc.html">My Profile</a>
+          <a href="myshop.html">My Shop</a>
+          <a href="login.html" id="logout-btn" class="logout-btn">Logout</a>
+        </div>
+      </li> 
+      <li>
+        <a href="cart.html">
+            <img src="images/shopping-cart.png" alt="Cart" class="cart-icon">
+        </a>
+      </li>  
+    </ul>
+  </nav>
+
+  <!-- Hero Section -->
+  <header class="hero-section">
+    <div class="hero-content">
+      <h1>Shop</h1>
+      <p id="breadcrumb">Home > <span id="current-page">Shop</span></p>
+    </div>
+    <a href="#"><img src="images/Rectangle 1.png" alt="User"></a>
+    <div class="search-container">
+      <input type="text" id="search-input" placeholder="Search for products, brands and shops">
+      <button id="search-btn">🔍</button>
+    </div>
+  </header>  
+
+  <!-- Filter and Sort Section -->
+  <section class="filter-sort">
+    <div class="filter-options">
+      <button class="filter-button active" data-filter="popular">Popular</button>
+      <button class="filter-button" data-filter="latest">Latest</button>
+      <button class="filter-button" data-filter="top-sales">Top Sales</button>
+    </div>
+    <span>Showing 1–16 of 32 results</span>
+    <div class="sort-options">
+      <label for="show">Show</label>
+      <select id="show">
+        <option value="16">16</option>
+        <option value="32">32</option>
+      </select>
+      <label for="sort">Sort by</label>
+      <select id="sort">
+        <option value="default">Default</option>
+        <option value="price-low">Price: Low to High</option>
+        <option value="price-high">Price: High to Low</option>
+      </select>
+    </div>
+  </section>  
+
+  <!-- Product Grid Section -->
+  <section id="product-grid" class="product-grid">
+    <!-- Products will be dynamically loaded here -->
+  </section>
+  
+  <!-- Pagination Section -->
+  <div class="pagination" id="pagination">
+    <!-- Add more buttons if necessary -->
+  </div>
+
+  <script src="product.js"></script> <!-- Your existing JS file -->
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-info">
+      <div><i class="icon-quality"></i> High Quality</div>
+      <div><i class="icon-warranty"></i> Warranty Protection</div>
+      <div><i class="icon-shipping"></i> Free Shipping</div>
+      <div><i class="icon-support"></i> 24/7 Support</div>
+    </div>
+    <div class="footer-links">
+      <p>Funiro © 2023. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script>
+    // Search functionality
+    document.getElementById("search-btn").addEventListener("click", function() {
+      const query = document.getElementById("search-input").value.toLowerCase();
+      const products = document.querySelectorAll(".product-card");
+  
+      products.forEach(product => {
+        const productName = product.querySelector(".product-info h3").innerText.toLowerCase();
+        product.style.display = productName.includes(query) ? "block" : "none";
+      });
+    });
+  </script>
+
+  <script>
+    // Reload page when clicking the logo
+    document.getElementById("logo").addEventListener("click", function() {
+      location.reload();
+    });
+  </script>
+
+  <script>
+    function reloadPage() {
+      window.location.href = "shop.html";  // Redirects to the home page
+    }
+  </script>
+
+  <!-- Logout functionality (redirection to login page) -->
+  <script>
+    document.getElementById('logout-btn').addEventListener('click', function() {
+      window.location.href = 'login.html';  // Redirect to login page on logout
+    });
+  </script>
+</body>
+</html>

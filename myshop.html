@@ -12,7 +12,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-storage-compat.js"></script>
     <!-- Chart.js for graphs -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
 </head>
 <body>
     <!-- Navigation Bar -->
@@ -128,217 +128,149 @@
                             <option>Confirmed Order</option>
                         </select>
                     </div>
-                    <div class="metrics-cards">
-                        <div class="metric-card">Sales</div>
-                        <div class="metric-card">Orders</div>
-                        <div class="metric-card">Sales per order</div>
-                    </div>
+                    <div id="key-metrics" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 20px 0;">
+                        <div><strong>Sales</strong><br><span id="sales">CNY 0</span><br><small id="sales-percent">0%</small></div>
+                        <div><strong>Orders</strong><br><span id="orders">0</span><br><small id="orders-percent">0%</small></div>
+                        <div><strong>Sales per Order</strong><br><span id="sales-per-order">CNY 0</span><br><small>0%</small></div>
+                        <div><strong>Buyers</strong><br><span id="buyers">0</span><br><small>0%</small></div>
+                        <div><strong>Sales per Buyer</strong><br><span id="sales-per-buyer">CNY 0</span><br><small>0%</small></div>
+                        <div><strong>Conversion Rate</strong><br><span id="conversion-rate">0%</span></div>
+                    </div>      
                 </div>
                 <canvas id="sales-chart" style="margin-top: 20px;"></canvas>
             </div>
         </div>
     </main>
 
-    <!-- Firebase Configuration and Initialization -->
     <script>
-        const firebaseConfig = {
-        apiKey: "AIzaSyCogse_Ke5U0xzdFoiQDv-85AzhMKnieCw",
-        authDomain: "des400-d3feb.firebaseapp.com",
-        projectId: "des400-d3feb",
-        storageBucket: "des400-d3feb.appspot.com",
-        messagingSenderId: "1063674569994",
-        appId: "1:1063674569994:web:525070c6d1500d93a806f3",
-        measurementId: "G-DW42H6ES0R"
-        };
+  // ✅ Firebase NEW project (mini-ecom-39979)
+  const firebaseConfig = {
+    apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
+    authDomain: "mini-ecom-39979.firebaseapp.com",
+    projectId: "mini-ecom-39979",
+    storageBucket: "mini-ecom-39979.firebasestorage.app",
+    messagingSenderId: "43435045240",
+    appId: "1:43435045240:web:ba425c522e37b4c1a7d88d"
+  };
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-        const storageRef = firebase.storage().ref();
-    
-        let currentUser = null;
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
 
-        auth.onAuthStateChanged(async (user) => {
-        if (user) {
-            currentUser = user;
-            const userDoc = await db.collection("users").doc(user.uid).get();
-            const userData = userDoc.data();
-            const shopName = userData.name || "My Shop";
-            document.getElementById("shop-name").textContent = shopName;
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const storageRef = firebase.storage().ref();
 
-            // Load order statuses
-            loadOrderStatuses(user.uid);
+  let currentUser = null;
+  let salesChart = null;
 
-            // Load user's products
-            loadUserProducts(user.uid);
-        } else {
-            window.location.href = "signup.html";
-        }
-        });
+  // ================= AUTH =================
+  auth.onAuthStateChanged(async (user) => {
+    if (user) {
+      currentUser = user;
 
-        async function loadOrderStatuses(userId) {
-        const ordersSnapshot = await db.collection("orders").where("sellerId", "==", userId).get();
-        let toShip = 0, cancelled = 0, returned = 0, review = 0;
+      const userDoc = await db.collection("users").doc(user.uid).get();
+      const userData = userDoc.data();
 
-        ordersSnapshot.forEach(doc => {
-            const status = doc.data().status;
-            if (status === "to ship") toShip++;
-            else if (status === "cancelled") cancelled++;
-            else if (status === "return") returned++;
-            else if (status === "review") review++;
-        });
+      const shopName = userData?.username || "My Shop";
+      document.getElementById("shop-name").textContent = shopName;
 
-            document.getElementById("to-ship-count").textContent = toShip;
-            document.getElementById("cancelled-count").textContent = cancelled;
-            document.getElementById("return-count").textContent = returned;
-            document.getElementById("review-count").textContent = review;
-        }
+      loadOrderStatuses(user.uid);
+      loadUserProducts(user.uid);
+    } else {
+      window.location.href = "login.html";
+    }
+  });
 
-        async function loadUserProducts(userId) {
-            const productsSnapshot = await db.collection("products").where("sellerId", "==", userId).get();
-            const productList = document.getElementById("product-list");
-            productList.innerHTML = "";
+  // ================= ORDER STATUS =================
+  async function loadOrderStatuses(userId) {
+    const snapshot = await db
+      .collection("orders")
+      .where("sellerId", "==", userId)
+      .get();
 
-            productsSnapshot.forEach(doc => {
-                const product = doc.data();
-                const li = document.createElement("li");
-                li.textContent = product.name;
-                productList.appendChild(li);
-            });
-        }
+    let toShip = 0, cancelled = 0, returned = 0, review = 0;
 
-        document.getElementById("logout-btn").addEventListener("click", () => {
-            auth.signOut().then(() => {
-                window.location.href = "login.html";
-            });
-        });
+    snapshot.forEach(doc => {
+      const status = doc.data().status;
+      if (status === "to ship") toShip++;
+      else if (status === "cancelled") cancelled++;
+      else if (status === "return") returned++;
+      else if (status === "review") review++;
+    });
 
-        document.getElementById("my-products-btn").addEventListener("click", () => {
-            document.getElementById("performance-popup").style.display = "none";
-            document.getElementById("my-products").style.display = "block";
-        });
+    document.getElementById("to-ship-count").textContent = toShip;
+    document.getElementById("cancelled-count").textContent = cancelled;
+    document.getElementById("return-count").textContent = returned;
+    document.getElementById("review-count").textContent = review;
+  }
 
-        document.getElementById("shop-performance-btn").addEventListener("click", () => {
-            document.getElementById("my-products").style.display = "none";
-            document.getElementById("performance-popup").style.display = "block";
-            loadPerformance("30days");
-        });
+  // ================= PRODUCTS =================
+  async function loadUserProducts(userId) {
+    const productList = document.getElementById("product-list");
+    productList.innerHTML = "";
 
-        document.getElementById("close-performance").addEventListener("click", () => {
-            document.getElementById("performance-popup").style.display = "none";
-        });
+    const snapshot = await db
+      .collection("products")
+      .where("userId", "==", userId)
+      .get();
 
-        /*document.getElementById("back-to-products").addEventListener("click", () => {
-            document.getElementById("performance-popup").style.display = "none";
-            document.getElementById("my-products").style.display = "block";
-        });*/
+    if (snapshot.empty) {
+      productList.innerHTML = "<li>No products found.</li>";
+      return;
+    }
 
-        function getStepSize(data) {
-            const max = Math.max(...data);
-            if (max <= 10) return 1;
-            if (max <= 50) return 5;
-            if (max <= 100) return 10;
-            return Math.ceil(max / 10);
-        }
+    snapshot.forEach(doc => {
+      const product = doc.data();
+      const li = document.createElement("li");
+      li.textContent = `${product.name} - ฿${product.price}`;
+      productList.appendChild(li);
+    });
+  }
 
-        
-        async function loadPerformance(period, buttonEl) {
-            // ปรับปุ่ม active
-            const allButtons = document.querySelectorAll(".period-button");
-            allButtons.forEach(btn => btn.classList.remove("active"));
-            if (buttonEl) buttonEl.classList.add("active");
+  // ================= PERFORMANCE (DUMMY) =================
+  function loadPerformance(period, button) {
+    document.querySelectorAll('.period-button')
+      .forEach(btn => btn.classList.remove('active'));
+    button.classList.add('active');
 
-            if (!currentUser) return;
+    document.getElementById('sales').textContent = "¥" + Math.floor(Math.random() * 10000);
+    document.getElementById('orders').textContent = Math.floor(Math.random() * 500);
+    document.getElementById('buyers').textContent = Math.floor(Math.random() * 300);
+    document.getElementById('sales-per-order').textContent = "¥" + Math.floor(Math.random() * 200);
+    document.getElementById('sales-per-buyer').textContent = "¥" + Math.floor(Math.random() * 500);
+    document.getElementById('conversion-rate').textContent = Math.floor(Math.random() * 100) + "%";
+    document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
 
-            const ordersSnapshot = await db.collection("orders")
-                .where("sellerId", "==", currentUser.uid)
-                .get();
+    const ctx = document.getElementById('sales-chart').getContext('2d');
+    if (salesChart) salesChart.destroy();
 
-            const now = new Date();
-            const salesData = {};
+    salesChart = new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+        datasets: [{
+          label: 'Sales',
+          data: Array(7).fill(0).map(() => Math.floor(Math.random() * 1000))
+        }]
+      },
+      options: {
+        scales: { y: { beginAtZero: true } }
+      }
+    });
+  }
 
-            ordersSnapshot.forEach(doc => {
-                const order = doc.data();
-                const date = order.date?.toDate?.() || new Date();
-                let key = "";
+  document.getElementById("shop-performance-btn").onclick = () => {
+    document.getElementById("performance-popup").style.display = "block";
+    loadPerformance('realtime', document.querySelector('.period-button'));
+  };
 
-                if (period === "day") {
-                    key = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-                } else if (period === "week") {
-                    const weekStart = new Date(date);
-                    weekStart.setDate(date.getDate() - date.getDay());
-                    key = `Week of ${weekStart.toISOString().split('T')[0]}`;
-                } else if (period === "month") {
-                    key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-                } else if (period === "yesterday") {
-                    const yesterday = new Date();
-                    yesterday.setDate(now.getDate() - 1);
-                    if (date.toDateString() !== yesterday.toDateString()) return;
-                    key = "Yesterday";
-                } else if (period === "7days") {
-                    const daysAgo = new Date();
-                    daysAgo.setDate(now.getDate() - 6);
-                    if (date < daysAgo) return;
-                    key = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-                } else if (period === "30days") {
-                    const daysAgo = new Date();
-                    daysAgo.setDate(now.getDate() - 29);
-                    if (date < daysAgo) return;
-                    key = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}`;
-                } else {
-                    key = "Real-Time";
-                }
+  document.getElementById("close-performance").onclick = () => {
+    document.getElementById("performance-popup").style.display = "none";
+  };
 
-            if (!salesData[key]) salesData[key] = { sales: 0, orders: 0 };
-            salesData[key].sales += order.totalAmount;
-            salesData[key].orders += 1;
-        });
-
-        const labels = Object.keys(salesData).sort();
-        const sales = labels.map(label => salesData[label].sales);
-        const orders = labels.map(label => salesData[label].orders);
-
-        const ctx = document.getElementById("sales-chart").getContext("2d");
-        if (window.salesChart) window.salesChart.destroy();
-
-        window.salesChart = new Chart(ctx, {
-                type: "line",
-                data: {
-                    labels,
-                    datasets: [
-                        {
-                            label: "Sales",
-                            data: sales,
-                            borderColor: "rgba(75, 192, 192, 1)",
-                            backgroundColor: "rgba(75, 192, 192, 0.2)",
-                            tension: 0.4,
-                            fill: true
-                        },
-                        {
-                            label: "Orders",
-                            data: orders,
-                            borderColor: "rgba(153, 102, 255, 1)",
-                            backgroundColor: "rgba(153, 102, 255, 0.2)",
-                            tension: 0.4,
-                            fill: true
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                stepSize: getStepSize(sales),
-                                precision: 0
-                            }
-                        }
-                    }
-                }
-            });
-        document.getElementById("last-updated").textContent = new Date().toLocaleTimeString();
-    }     
-    </script>
+  document.getElementById("logout-btn").onclick = () => {
+    auth.signOut().then(() => window.location.href = "login.html");
+  };
+</script>
 </body>
 </html>

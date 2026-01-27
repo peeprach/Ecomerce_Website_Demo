@@ -1,0 +1,85 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f8f8f8;
+}
+
+.page-title {
+  margin: 30px auto 10px;
+  max-width: 1200px;
+  font-weight: bold;
+}
+
+/* ===== Header Row ===== */
+.order-header-row {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 120px 1fr 100px 150px;
+  padding: 15px;
+  background: #ffc107;
+  font-weight: bold;
+  border-radius: 6px 6px 0 0;
+}
+
+/* ===== Order List ===== */
+.order-list {
+  max-width: 1200px;
+  margin: 0 auto 40px;
+  background: #fff;
+  border-radius: 0 0 6px 6px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+}
+
+/* ===== Loading / Empty ===== */
+.loading {
+  padding: 30px;
+  text-align: center;
+  color: #777;
+}
+
+/* ===== Order Card ===== */
+.order-card {
+  border-bottom: 3px solid #eee;
+}
+
+/* ===== Item Rows ===== */
+.order-row {
+  display: grid;
+  grid-template-columns: 120px 1fr 100px 150px;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.order-row:last-child {
+  border-bottom: none;
+}
+
+/* ===== Columns ===== */
+.col.image img {
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+
+.col.name {
+  font-weight: 600;
+}
+
+.col.qty,
+.col.total {
+  text-align: center;
+  font-weight: bold;
+}
+
+/* ===== Order Meta ===== */
+.order-meta {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 15px;
+  font-size: 14px;
+  background: #fafafa;
+  border-top: 1px solid #ddd;
+}

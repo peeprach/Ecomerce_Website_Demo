@@ -1,123 +1,156 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>View Shop</title>
-    <link rel="stylesheet" href="viewshop.css"/>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-storage-compat.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>View My Shop</title>
+  <link rel="stylesheet" href="viewshop.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="logo">
-        <img src="images/logo433.png" alt="DES403 Logo" class="logo-img" />
-        <span class="logo-text">CSS MALL</span>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="logo">
+      <img src="images/logo433.png" alt="DES403 Logo" class="logo-img">
+      <span class="logo-text"> CSS MALL</span>
+    </div>
+    <ul class="nav-links">
+      <li><a href="home.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="coupon.html">Coupon</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropbtn">My account</a>
+        <div class="dropdown-content">
+          <a href="acc.html">My Profile</a>
+          <a href="myshop.html">My Shop</a>
+          <a href="login.html" id="logout-btn" class="logout-btn">Logout</a>
         </div>
-            <ul class="nav-links">
-            <li><a href="home.html">Home</a></li>
-            <li><a href="shop.html">Shop</a></li>
-            <li><a href="coupon.html">Coupon</a></li>
-            <li class="dropdown">
-                <a href="#" class="dropbtn">My Account</a>
-                <div class="dropdown-content">
-                    <a href="acc.html">My Profile</a>
-                    <a href="myshop.html" class="active">My Shop</a>
-                    <a href="#" id="logout-btn">Logout</a>
-                </div>
-            </li>
-            <li>
-                <a href="cart.html">
-                <img src="images/shopping-cart.png" alt="Cart" class="cart-icon" />
-                </a>
-            </li>
-        </ul>
-    </nav>
-    
-    <main>
-        <section class="shop-section">
-            <div class="shop-header">
-                <h1 id="shop-name">Shop Name</h1>
-                <div class="shop-meta">
-                <span>⭐ N/A</span> |
-                <span id="follower-count">0 followers</span>
-                </div>
-            </div>
-        </section>
-      
-        <hr />
-      
-        <section class="product-section">
-            <div class="product-header">
-                <h2>My Products</h2>
-                <a href="add-product.html" class="add-product-btn">+ Add New Product</a>
-            </div>
-          
-            <div id="product-container" class="product-list">
-              <!-- Products will be shown here -->
-            </div>
-            <p id="no-products" class="no-products">No more product found.</p>
-        </section>
-    </main>
-      
+      </li>
+      <li>
+        <a href="cart.html">
+          <img src="images/shopping-cart.png" class="cart-icon">
+          <span id="cart-count" class="cart-count-badge">0</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
 
-    <script>
-        const firebaseConfig = {
-        apiKey: "AIzaSyCogse_Ke5U0xzdFoiQDv-85AzhMKnieCw",
-        authDomain: "des400-d3feb.firebaseapp.com",
-        projectId: "des400-d3feb",
-        storageBucket: "des400-d3feb.appspot.com",
-        messagingSenderId: "1063674569994",
-        appId: "1:1063674569994:web:525070c6d1500d93a806f3",
-        measurementId: "G-DW42H6ES0R"
-        };
+  <main>
+    <section class="shop-header">
+      <h1 id="shop-name">My Shop</h1>
+      <div class="shop-meta">
+        <span>⭐ N/A</span> |
+        <span id="follower-count">0 followers</span>
+      </div>
+    </section>
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+    <hr />
 
-        auth.onAuthStateChanged(async (user) => {
-        if (!user) {
-            window.location.href = "login.html";
-            return;
+    <section class="product-section">
+      <div class="product-header">
+        <h2>My Products</h2>
+        <a href="add-product.html" class="add-product-btn">+ Add New Product</a>
+      </div>
+
+      <!-- Grid like shop.html -->
+      <div id="product-grid" class="product-grid"></div>
+      <p id="no-products" class="no-products">No more product found.</p>
+    </section>
+  </main>
+
+  <script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
+    authDomain: "mini-ecom-39979.firebaseapp.com",
+    projectId: "mini-ecom-39979",
+    storageBucket: "mini-ecom-39979.firebasestorage.app",
+    messagingSenderId: "43435045240",
+    appId: "1:43435045240:web:ba425c522e37b4c1a7d88d"
+  };
+  firebase.initializeApp(firebaseConfig);
+
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  const productGrid = document.getElementById("product-grid");
+  const noProducts = document.getElementById("no-products");
+
+  auth.onAuthStateChanged(user => {
+    if(!user){
+      window.location.href = "login.html";
+      return;
+    }
+
+    // Shop info
+    db.collection("users").doc(user.uid).get().then(doc => {
+      const data = doc.data() || {};
+      document.getElementById("shop-name").textContent = data.username || "My Shop";
+    });
+
+    // Followers count
+    db.collection("follows").where("shopId","==",user.uid).get()
+      .then(snap => {
+        document.getElementById("follower-count").textContent = `${snap.size} followers`;
+      });
+
+    // Realtime listener for products
+    db.collection("users").doc(user.uid).collection("products")
+      .orderBy("createdAt","desc")
+      .onSnapshot(snapshot => {
+        productGrid.innerHTML = ""; // clear grid
+        if(snapshot.empty){
+          noProducts.style.display = "block";
+          return;
         }
+        noProducts.style.display = "none";
 
-        const userDoc = await db.collection("users").doc(user.uid).get();
-        const userData = userDoc.data();
-        document.getElementById("shop-name").textContent = userData.name || "My Shop";
-
-        // Load followers count
-        const followersSnap = await db.collection("follows")
-            .where("shopId", "==", user.uid).get();
-        document.getElementById("follower-count").textContent =
-            `${followersSnap.size} followers`;
-
-        // Load products
-        const productsSnap = await db.collection("products")
-            .where("sellerId", "==", user.uid).get();
-
-        const productContainer = document.getElementById("product-container");
-        const noProductsText = document.getElementById("no-products");
-
-        if (productsSnap.empty) {
-            noProductsText.style.display = "block";
-        } else {
-            noProductsText.style.display = "none";
-            productsSnap.forEach(doc => {
-            const product = doc.data();
-            const div = document.createElement("div");
-            div.classList.add("product-card");
-            div.innerHTML = `
-                <h3>${product.name}</h3>
-                <p>Price: $${product.price}</p>
-            `;
-            productContainer.appendChild(div);
-            });
-        }
+        snapshot.forEach(doc => {
+          const p = doc.data();
+          const card = document.createElement("div");
+          card.classList.add("product-card");
+          card.innerHTML = `
+            <img src="${p.imageUrl || 'images/placeholder.jpg'}" alt="${p.name}" />
+            <div class="product-info">
+              <h3>${p.name}</h3>
+              <p>${p.description || ''}</p>
+              <p class="price">$${p.price}</p>
+              <div class="product-buttons">
+                <button onclick="addToCart('${doc.id}')">Add to Cart</button>
+                <button onclick="buyNow('${doc.id}')">Buy Now</button>
+              </div>
+            </div>
+          `;
+          productGrid.appendChild(card);
         });
-    </script>
+      });
+
+    // Add to cart / buy now
+    window.addToCart = function(productId){
+      const ref = db.collection("carts").doc(user.uid).collection("items").doc(productId);
+      ref.get().then(doc=>{
+        if(doc.exists) return ref.update({quantity: doc.data().quantity+1});
+        else return ref.set({quantity:1});
+      }).then(()=> alert("Added to cart!"))
+      .catch(err=>alert(err.message));
+    }
+
+    window.buyNow = function(productId){
+      const ref = db.collection("carts").doc(user.uid).collection("items").doc(productId);
+      ref.get().then(doc=>{
+        if(doc.exists) return ref.update({quantity: doc.data().quantity+1});
+        else return ref.set({quantity:1});
+      }).then(()=> window.location.href="cart.html")
+      .catch(err=>alert(err.message));
+    }
+
+    // Logout
+    document.getElementById("logout-btn").addEventListener("click", ()=>{
+      auth.signOut().then(()=>window.location.href="login.html");
+    });
+  });
+  </script>
+
 </body>
 </html>

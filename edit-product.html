@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Edit Product</title>
+  <link rel="stylesheet" href="add-product.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-storage-compat.js"></script>
+</head>
+<body>
+  <main>
+    <h1>Edit Product</h1>
+    <form id="edit-product-form">
+      <label>Product Name:
+        <input type="text" id="product-name" maxlength="120" required />
+      </label><br/>
+
+      <label>Description:
+        <textarea id="product-description" maxlength="500" required></textarea>
+      </label><br/>
+
+      <label>Price:
+        <input type="number" id="product-price" min="0" required />
+      </label><br/>
+
+      <label>Stock:
+        <input type="number" id="product-stock" min="0" required />
+      </label><br/>
+
+      <label>Category:
+        <input type="text" id="product-category" required />
+      </label><br/>
+
+      <label>Condition:
+        <select id="product-condition" required>
+          <option value="new">New</option>
+          <option value="used">Used</option>
+        </select>
+      </label><br/>
+
+      <label>
+        <input type="checkbox" id="product-preorder" />
+        Pre-order
+      </label><br/>
+
+      <label>Shipping Fee:
+        <input type="number" id="product-shipping" min="0" required />
+      </label><br/>
+
+      <label>Current Images:</label><br/>
+      <div id="current-images" style="display: flex; flex-wrap: wrap; gap: 10px;"></div><br/>
+
+      <label>Replace Images (max 20):
+        <input type="file" id="product-images" accept="image/*" multiple />
+      </label><br/>
+
+      <button type="submit">Update Product</button>
+    </form>
+  </main>
+
+  <script>
+  // 🔥 Firebase NEW project
+  const firebaseConfig = {
+    apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
+    authDomain: "mini-ecom-39979.firebaseapp.com",
+    projectId: "mini-ecom-39979",
+    storageBucket: "mini-ecom-39979.firebasestorage.app",
+    messagingSenderId: "43435045240",
+    appId: "1:43435045240:web:ba425c522e37b4c1a7d88d"
+  };
+
+  // Initialize Firebase
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+
+  const productId = new URLSearchParams(window.location.search).get("id");
+  const form = document.getElementById("edit-product-form");
+
+  auth.onAuthStateChanged(async user => {
+    if (!user) {
+      window.location.href = "login.html";
+      return;
+    }
+
+    // Load product data
+    const doc = await db.collection("products").doc(productId).get();
+    if (!doc.exists) {
+      alert("Product not found");
+      return;
+    }
+
+    const product = doc.data();
+    document.getElementById("product-name").value = product.name || "";
+    document.getElementById("product-description").value = product.description || "";
+    document.getElementById("product-price").value = product.price || 0;
+    document.getElementById("product-stock").value = product.stock || 0;
+    document.getElementById("product-category").value = product.category || "";
+    document.getElementById("product-condition").value = product.condition || "new";
+    document.getElementById("product-preorder").checked = product.preorder || false;
+    document.getElementById("product-shipping").value = product.shippingFee || 0;
+
+    // Show current images
+    const imageContainer = document.getElementById("current-images");
+    imageContainer.innerHTML = "";
+
+    if (product.imageUrls && product.imageUrls.length > 0) {
+      product.imageUrls.forEach(url => {
+        const img = document.createElement("img");
+        img.src = url;
+        img.style.maxWidth = "120px";
+        img.style.border = "1px solid #ccc";
+        imageContainer.appendChild(img);
+      });
+    } else {
+      imageContainer.textContent = "No images.";
+    }
+
+    // Handle submit
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const updatedProduct = {
+        name: document.getElementById("product-name").value,
+        description: document.getElementById("product-description").value,
+        price: Number(document.getElementById("product-price").value),
+        stock: Number(document.getElementById("product-stock").value),
+        category: document.getElementById("product-category").value,
+        condition: document.getElementById("product-condition").value,
+        preorder: document.getElementById("product-preorder").checked,
+        shippingFee: Number(document.getElementById("product-shipping").value),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
+
+      const files = document.getElementById("product-images").files;
+
+      if (files.length > 0) {
+        if (files.length > 20) {
+          alert("You can upload up to 20 images.");
+          return;
+        }
+
+        const uploadPromises = [];
+        const newImageUrls = [];
+
+        for (const file of files) {
+          const ref = storage.ref(`product-images/${productId}/${Date.now()}_${file.name}`);
+          uploadPromises.push(
+            ref.put(file).then(async () => {
+              const url = await ref.getDownloadURL();
+              newImageUrls.push(url);
+            })
+          );
+        }
+
+        await Promise.all(uploadPromises);
+        updatedProduct.imageUrls = newImageUrls;
+      }
+
+      await db.collection("products").doc(productId).update(updatedProduct);
+      alert("Product updated successfully!");
+      window.location.href = "viewshop.html";
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>My Purchases</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link rel="stylesheet" href="my-purchase.css">
+
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+
+<h1 class="page-title">🛒 My Purchases</h1>
+
+<!-- Table Header -->
+<div class="order-header-row">
+  <div>Picture</div>
+  <div>Name</div>
+  <div>Qty</div>
+  <div>Total</div>
+</div>
+
+<div id="order-list" class="order-list">
+  <p class="loading">Loading orders...</p>
+</div>
+
+<script>
+/* ================= Firebase ================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
+  authDomain: "mini-ecom-39979.firebaseapp.com",
+  projectId: "mini-ecom-39979"
+};
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+const orderList = document.getElementById("order-list");
+
+/* ================= Load Orders ================= */
+auth.onAuthStateChanged(async user => {
+  if (!user) {
+    orderList.innerHTML = `<p class="loading">Please login to view your orders.</p>`;
+    return;
+  }
+
+  let snap;
+  try {
+    snap = await db.collection("orders")
+      .where("userId", "==", user.uid)
+      .orderBy("createdAt", "desc")
+      .get();
+  } catch (err) {
+    console.error(err);
+    orderList.innerHTML = `<p class="loading">Error loading orders</p>`;
+    return;
+  }
+
+  if (snap.empty) {
+    orderList.innerHTML = `<p class="loading">No orders found.</p>`;
+    return;
+  }
+
+  orderList.innerHTML = "";
+
+  snap.forEach(doc => {
+    const order = doc.data();
+    const orderCard = document.createElement("div");
+    orderCard.className = "order-card";
+
+    const date = order.createdAt?.toDate().toLocaleString() || "-";
+
+    /* ===== Items ===== */
+    let itemsHTML = "";
+    (order.items || []).forEach(item => {
+      itemsHTML += `
+        <div class="order-row">
+          <div class="col image">
+            <img src="${item.imageUrl || 'images/placeholder.jpg'}">
+          </div>
+          <div class="col name">${item.name}</div>
+          <div class="col qty">${item.quantity}</div>
+          <div class="col total">CNY ${item.price * item.quantity}</div>
+        </div>
+      `;
+    });
+
+    orderCard.innerHTML = `
+      <div class="order-items">
+        ${itemsHTML}
+      </div>
+
+      <div class="order-meta">
+        <span><strong>Order ID:</strong> ${doc.id}</span>
+        <span><strong>Date:</strong> ${date}</span>
+        <span><strong>Payment:</strong> ${order.payment?.toUpperCase()}</span>
+      </div>
+    `;
+
+    orderList.appendChild(orderCard);
+  });
+});
+</script>
+
+</body>
+</html>

@@ -38,11 +38,8 @@
     </nav>
 
     <section class="login-container">
-        <!-- Background Image -->
         <div class="background">
             <img src="images/welcome_bg.png" alt="CSS MALL Background" class="bg-image">
-            
-            <!-- Overlay Box -->
             <div class="overlay-box">
                 <h2>Welcome to CSS Mall</h2>
                 <p>Place where you can buy everything</p>
@@ -58,18 +55,36 @@
     </section>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const logoutButton = document.getElementById('logout-btn');
-            
-            // If needed, clear user session or cookies before redirecting
-            logoutButton.addEventListener('click', () => {
-                // Clear any session data (if applicable) or perform any other necessary actions
-                // For example, localStorage.removeItem('user'); if you're storing user info in localStorage
+    // ✅ Firebase NEW project
+    const firebaseConfig = {
+      apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
+      authDomain: "mini-ecom-39979.firebaseapp.com",
+      projectId: "mini-ecom-39979",
+      storageBucket: "mini-ecom-39979.firebasestorage.app",
+      messagingSenderId: "43435045240",
+      appId: "1:43435045240:web:ba425c522e37b4c1a7d88d"
+    };
 
-                // Redirect to login page
-                window.location.href = 'login.html'; // Adjust the URL if your login page is different
-            });
-        });
-    </script>
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    auth.onAuthStateChanged(user => {
+      if (!user) {
+        window.location.href = "login.html";
+      }
+    });
+
+    // 🚪 Logout
+    document.getElementById('logout-btn').addEventListener('click', async (e) => {
+      e.preventDefault();
+
+      try {
+        await auth.signOut();
+        window.location.href = "login.html";
+      } catch (error) {
+        console.error("Logout error:", error);
+      }
+    });
+  </script>
 </body>
 </html>

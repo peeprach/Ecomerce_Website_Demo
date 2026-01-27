@@ -21,10 +21,9 @@
 
   <!-- Sign Up Section -->
   <section class="signup-container">
-    <!-- Left Side (Logo) -->
     <div class="left-side">
       <img src="images/logo433.png" alt="CSS MALL Logo" class="large-logo">
-      <h2>แหล่งช้อปปิ้งออนไลน์ที่ดีที่สุด</h2>
+      <h2>The best online shopping destinations.</h2>
     </div>
 
     <!-- Sign Up Section -->
@@ -78,82 +77,78 @@
 
   <!-- Firebase Configuration and Script -->
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyCogse_Ke5U0xzdFoiQDv-85AzhMKnieCw",
-      authDomain: "des400-d3feb.firebaseapp.com",
-      projectId: "des400-d3feb",
-      storageBucket: "des400-d3feb.firebasestorage.app",
-      messagingSenderId: "1063674569994",
-      appId: "1:1063674569994:web:525070c6d1500d93a806f3",
-      measurementId: "G-DW42H6ES0R"
-    }; 
-  
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
-    const db = firebase.firestore();
-  
-    // Handle Sign-Up
-    document.getElementById('signup-form').addEventListener('submit', async (e) => {
-      e.preventDefault(); // Prevent default form submission
-  
-      const username = document.getElementById('name').value.trim();
-      const email = document.getElementById('email').value.trim();
-      const phoneNumber = document.getElementById('phoneNumber').value.trim();
-      const password = document.getElementById('password').value;
-      const confirmPassword = document.getElementById('confirm-password').value;
-      const gender = document.querySelector('input[name="gender"]:checked')?.value || "";
-      const dob = document.getElementById('dob').value;
-      const signupMessage = document.getElementById('signup-message');
-  
-      // Clear previous messages
-      signupMessage.innerText = "";
-      signupMessage.style.color = "red";
-  
-      // Validate inputs
-      if (!username || !email || !phoneNumber || !gender || !dob) {
-        signupMessage.innerText = "All fields are required!";
-        return;
-      }
-  
-      if (password.length < 6) {
-        signupMessage.innerText = "Password must be at least 6 characters!";
-        return;
-      }
-  
-      if (password !== confirmPassword) {
-        signupMessage.innerText = "Passwords do not match!";
-        return;
-      }
-  
-      try {
-        // Sign up user
-        const userCredential = await auth.createUserWithEmailAndPassword(email, password);
-        const user = userCredential.user;
-  
-        // Save user info to Firestore
-        await db.collection("users").doc(user.uid).set({
-          username: username,
-          email: email,
-          phoneNumber: phoneNumber,
-          gender: gender,
-          dob: dob,
-          createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        });
-  
-        signupMessage.style.color = "green";
-        signupMessage.innerText = "Sign-up successful! Redirecting...";
-  
-        // Redirect to home page
-        setTimeout(() => {
-          window.location.href = "home.html";
-        }, 2000);
-  
-      } catch (error) {
-        signupMessage.innerText = error.message;
-        console.error("Error signing up:", error);
-      }
-    });
-  </script>  
+  // ✅ Firebase NEW project
+  const firebaseConfig = {
+    apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
+    authDomain: "mini-ecom-39979.firebaseapp.com",
+    projectId: "mini-ecom-39979",
+    storageBucket: "mini-ecom-39979.firebasestorage.app",
+    messagingSenderId: "43435045240",
+    appId: "1:43435045240:web:ba425c522e37b4c1a7d88d"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // Handle Sign-Up
+  document.getElementById('signup-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const username = document.getElementById('name').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phoneNumber = document.getElementById('phoneNumber').value.trim();
+    const password = document.getElementById('password').value;
+    const confirmPassword = document.getElementById('confirm-password').value;
+    const gender = document.querySelector('input[name="gender"]:checked')?.value;
+    const dob = document.getElementById('dob').value;
+    const signupMessage = document.getElementById('signup-message');
+
+    signupMessage.innerText = "";
+    signupMessage.style.color = "red";
+
+    if (!username || !email || !phoneNumber || !gender || !dob) {
+      signupMessage.innerText = "All fields are required!";
+      return;
+    }
+
+    if (password.length < 6) {
+      signupMessage.innerText = "Password must be at least 6 characters!";
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      signupMessage.innerText = "Passwords do not match!";
+      return;
+    }
+
+    try {
+      const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+      const user = userCredential.user;
+
+      await db.collection("users").doc(user.uid).set({
+        username,
+        email,
+        phoneNumber,
+        gender,
+        dob,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+
+      signupMessage.style.color = "green";
+      signupMessage.innerText = "Sign-up successful! Redirecting...";
+
+      setTimeout(() => {
+        window.location.href = "home.html";
+      }, 2000);
+
+    } catch (error) {
+      signupMessage.innerText = error.message;
+      console.error(error);
+    }
+  });
+</script>
 </body>
 </html>

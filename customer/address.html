@@ -8,377 +8,234 @@
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+  <script src="cart.js"></script>
+
 </head>
 <body>
-    <nav class="navbar">
-        <div class="logo">
-        <img src="../images/logo433.png" alt="DES403 Logo" class="logo-img" />
-        <span class="logo-text">CSS MALL</span>
-        </div>
-        <ul class="nav-links">
-        <li><a href="../home.html">Home</a></li>
-        <li><a href="../shop.html">Shop</a></li>
-        <li><a href="../coupon.html">Coupon</a></li>
-        <li class="dropdown">
-            <a href="#" class="dropbtn">My account</a>
-            <div class="dropdown-content">
-            <a href="../acc.html">My Profile</a>
-            <a href="../myshop.html">My Shop</a>
-            <a href="../login.html" id="logout-btn" class="logout-btn">Logout</a>
-            </div>
-        </li>
-        <li>
-            <a href="cart.html">
-            <img src="../images/shopping-cart.png" alt="Cart" class="cart-icon" />
-            </a>
-        </li>
-        </ul>
-    </nav>
-
-    <!-- Account Section -->
-    <div class="container">
-        <!-- Left Sidebar -->
-        <aside class="sidebar">
-        <div class="profile-section">
-            <label for="profile-pic-input">
-            <img id="profile-pic" src="/images/user-pro.png" alt="Profile Picture" class="profile-pic" />
-            </label>
-            <button class="edit-profile" onclick="uploadProfilePicture()">Edit Profile</button>
-            <input type="file" id="profile-pic-input" accept="image/*" style="display: none;" />
-        </div>
-        <nav class="menu">
-            <ul>
-            <li id="account-menu">
-                <a href="#" onclick="toggleSubmenu(event)">
-                <img src="../images/user.png" class="icon" /> My Account
-                </a>
-                <ul class="submenu">
-                <li><a href="../acc.html">Profile</a></li>
-                <li><a href="../customer/bank.html">Banks & Cards</a></li>
-                <li><a href="../customer/address.html">Addresses</a></li>
-                <li><a href="#">Change Password</a></li>
-                <li><a href="#">Privacy Settings</a></li>
-                <li><a href="#">Notification Settings</a></li>
-                </ul>
-            </li>
-            <li><a href="#" style="margin-top: 10px;"><img src="../images/purchase.png" class="icon" /> My Purchase</a></li>
-            <li><a href="#"><img src="../images/notic.png" class="icon" /> Notification</a></li>
-            </ul>
-        </nav>
-        </aside>
-
-        <main class="main-content">
-            <h2>My Addresses</h2>
-            <div class="subtitle-with-button">
-                <p class="profile-subtitle">Address</p>
-                <button id="add-new-card" onclick="showCardForm()">+ Add New Address</button>
-            </div>
-
-            <div id="loading">Loading...</div>
-            <div id="card-content" style="display: none;">
-                <div id="card-list"></div>
-            </div>
-
-        <div id="address-form" style="display: none;">
-            <h3>New Address</h3>
-            <input type="text" id="fullname" placeholder="Full Name" maxlength="50" required />
-            <input type="text" id="phoneno" placeholder="Phone Number" required />
-            <input type="text" id="address-detail" placeholder="Province, District, Sub District, Postal Code" readonly required onclick="toggleDropdown()" />
-                <div id="address-dropdown" style="display:none; border: 1px solid #ccc; padding: 10px; margin-top: 5px;border-radius: 5px; width: 90%; margin: 5px 0 10px 20px;">
-                    <select id="province" required>
-                        <option value="" disabled selected>Province</option>
-                    </select>
-                    <select id="district" required>
-                        <option value="" disabled selected>District</option>
-                    </select>
-                    <select id="subdistrict" required>
-                        <option value="" disabled selected>Sub District</option>
-                    </select>
-                    <select id="zipcode" required>
-                        <option value="" disabled selected>Postal Code</option>
-                    </select>                  
-                </div>
-            <input type="text" id="detail" placeholder="Street Name, Building, House No." required />
-            <button onclick="submit()">Submit</button>
-            <button onclick="hideCardForm()">Cancel</button>
-        </div>
-        </main>
+  <!-- Navigation -->
+  <nav class="navbar">
+    <div class="logo">
+      <img src="../images/logo433.png" alt="DES403 Logo" class="logo-img" />
+      <span class="logo-text">CSS MALL</span>
     </div>
+    <ul class="nav-links">
+      <li><a href="../home.html">Home</a></li>
+      <li><a href="../shop.html">Shop</a></li>
+      <li><a href="../coupon.html">Coupon</a></li>
+      <li class="dropdown">
+        <a href="#" class="dropbtn">My account</a>
+        <div class="dropdown-content">
+          <a href="../acc.html">My Profile</a>
+          <a href="../myshop.html">My Shop</a>
+          <a href="../login.html" id="logout-btn" class="logout-btn">Logout</a>
+        </div>
+      </li>
+      <li>
+        <a href="cart.html">
+          <img src="../images/shopping-cart.png" class="cart-icon">
+          <span id="cart-count" class="cart-count-badge"></span>
+        </a>
+      </li>
+    </ul>
+  </nav>
 
-    <script>
-        const firebaseConfig = {
-        apiKey: "AIzaSyCogse_Ke5U0xzdFoiQDv-85AzhMKnieCw",
-        authDomain: "des400-d3feb.firebaseapp.com",
-        projectId: "des400-d3feb",
-        storageBucket: "des400-d3feb.appspot.com",
-        messagingSenderId: "1063674569994",
-        appId: "1:1063674569994:web:525070c6d1500d93a806f3",
-        measurementId: "G-DW42H6ES0R"
-        };
+  <!-- Main container -->
+  <div class="container">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="profile-section">
+        <label for="profile-pic-input">
+          <img id="profile-pic" src="/images/user-pro.png" alt="Profile Picture" class="profile-pic" />
+        </label>
+        <button class="edit-profile" onclick="uploadProfilePicture()">Edit Profile</button>
+        <input type="file" id="profile-pic-input" accept="image/*" style="display: none;" />
+      </div>
+      <nav class="menu">
+        <ul>
+          <li id="account-menu">
+            <a href="#" onclick="toggleSubmenu(event)">
+              <img src="../images/user.png" class="icon" /> My Account
+            </a>
+            <ul class="submenu">
+              <li><a href="../acc.html">Profile</a></li>
+              <li><a href="../customer/bank.html">Banks & Cards</a></li>
+              <li><a href="../customer/address.html">Addresses</a></li>
+              <li><a href="../customer/change.html">Change Password</a></li>
+              <li><a href="#">Privacy Settings</a></li>
+              <li><a href="#">Notification Settings</a></li>
+            </ul>
+          </li>
+          <li><a href="../customer/my-purchase.html" style="margin-top: 10px;"><img src="../images/purchase.png" class="icon" /> My Purchase</a></li>
+          <li><a href="#"><img src="../images/notic.png" class="icon" /> Notification</a></li>
+        </ul>
+      </nav>
+    </aside>
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+    <!-- Main content -->
+    <main class="main-content">
+      <h2>My Addresses</h2>
+      <div class="subtitle-with-button">
+        <p class="profile-subtitle">Address</p>
+        <button id="add-new-card" onclick="showCardForm()">+ Add New Address</button>
+      </div>
 
-        function showCardForm() {
-        document.getElementById("address-form").style.display = "block";
-        }
+      <div id="loading">Loading...</div>
+      <div id="card-content" style="display: none;">
+        <div id="card-list"></div>
+      </div>
+    </main>
+  </div>
 
-        function hideCardForm() {
-        document.getElementById("address-form").style.display = "none";
-        }
+  <!-- Overlay popup -->
+  <div id="address-overlay" class="overlay" style="display:none;">
+    <div class="address-modal">
+      <h3>Add shipping address</h3>
+      <input type="hidden" id="country" value="China" />
+      <label>Address information</label>
+      <input type="text" id="address-detail" placeholder="Province, City, District, Postal Code" />
+      <label>Detailed address</label>
+      <input type="text" id="detail" placeholder="Street Name, Building, House No." />
+      <label>Recipient's Name</label>
+      <input type="text" id="fullname" placeholder="Full Name" />
+      <label>Phone number</label>
+      <div class="phone-row">
+        <select id="country-code">
+          <option value="+86" selected>China (+86)</option>
+        </select>
+        <input type="text" id="phoneno" placeholder="Phone number" />
+      </div>
+      
+      <div class="btn-row">
+        <button class="btn-cancel" type="button" onclick="hideCardForm()">Cancel</button>
+        <button class="btn-confirm" type="button" onclick="submitAddress()">Confirm</button>
+      </div>
+    </div>
+  </div>
 
-        function submit() {
-            const user = auth.currentUser;
-            if (!user) {
-                alert("Please log in first!");
-                return;
-            }
+  <script>
+    // Firebase config
+    const firebaseConfig = {
+      apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
+      authDomain: "mini-ecom-39979.firebaseapp.com",
+      projectId: "mini-ecom-39979",
+      storageBucket: "mini-ecom-39979.firebasestorage.app",
+      messagingSenderId: "43435045240",
+      appId: "1:43435045240:web:ba425c522e37b4c1a7d88d"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db = firebase.firestore();
+    
+    
+    // Show/hide overlay
+    function showCardForm() {
+      document.getElementById("address-overlay").style.display = "flex";
+    }
+    function hideCardForm() {
+      document.getElementById("address-overlay").style.display = "none";
+      // Reset fields
+      document.getElementById("address-detail").value = "";
+      document.getElementById("detail").value = "";
+      document.getElementById("fullname").value = "";
+      document.getElementById("phoneno").value = "";
+      document.getElementById("default-address").checked = false;
+    }
 
-            const fullName = document.getElementById("fullname").value;
-            const phone = document.getElementById("phoneno").value;
-            const province = document.getElementById("province").value;
-            const district = document.getElementById("district").value;
-            const subdistrict = document.getElementById("subdistrict").value;
-            const zipcode = document.getElementById("zipcode").value;
-            const detail = document.getElementById("detail").value;
+    // Submit new address
+    async function submitAddress() {
+      const user = auth.currentUser;
+      if(!user){ alert("Please log in first."); return; }
 
-            if (!fullName || !phone || !province || !district || !subdistrict || !zipcode || !detail) {
-                alert("Please fill in all address fields.");
-                return;
-            }
+      const addressInfo = document.getElementById("address-detail").value.trim();
+      const detail = document.getElementById("detail").value.trim();
+      const fullname = document.getElementById("fullname").value.trim();
+      const phoneno = document.getElementById("phoneno").value.trim();
+      const isDefault = document.getElementById("default-address").checked;
 
-            const addressData = {
-                fullName,
-                phone,
-                province,
-                district,
-                subdistrict,
-                zipcode,
-                detail,
-                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-            };
+      if(!addressInfo || !detail || !fullname || !phoneno){
+        alert("Please fill all required fields.");
+        return;
+      }
 
-            const addressRef = db.collection("users").doc(user.uid).collection("addresses");
+      const addressData = {
+        addressInfo,
+        detail,
+        fullname,
+        phoneno,
+        isDefault: !!isDefault,
+        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      };
 
-            if (editingAddressId) {
-                addressRef.doc(editingAddressId).update(addressData)
-                    .then(() => {
-                        alert("Address updated successfully!");
-                        editingAddressId = null;
-                        hideCardForm();
-                        loadUserAddresses();
-                    })
-                    .catch(error => {
-                        console.error("Error updating address:", error);
-                        alert("Failed to update address.");
-                    });
-            } else {
-                addressData.addedAt = firebase.firestore.FieldValue.serverTimestamp();
-                addressRef.add(addressData)
-                    .then(() => {
-                        alert("Address added successfully!");
-                        hideCardForm();
-                        loadUserAddresses();
-                    })
-                    .catch(error => {
-                        console.error("Error adding address:", error);
-                        alert("Failed to add address.");
-                    });
-            }
-        }
+      try{
+        await db.collection("users").doc(user.uid).collection("addresses").add(addressData);
+        hideCardForm();          // ปิด popup
+        loadUserAddresses();     // โหลด address ใหม่ทันที
+      } catch(err){
+        console.error(err);
+        alert("Failed to add address.");
+      }
+    }
 
+    // Load addresses of user
+    function loadUserAddresses(){
+      const user = auth.currentUser;
+      if(!user) return;
+      const cardList = document.getElementById("card-list");
+      cardList.innerHTML = "Loading...";
 
-        function loadUserAddresses() {
-            const user = auth.currentUser;
-            if (!user) return;
-
-            db.collection("users").doc(user.uid).collection("addresses")
-                .orderBy("addedAt", "desc")
-                .get()
-                .then(snapshot => {
-                    const cardList = document.getElementById("card-list");
-                    cardList.innerHTML = "";
-
-                    snapshot.forEach(doc => {
-                        const data = doc.data();
-
-                        // หา name จาก id
-                        const provinceName = provinces.find(p => p.id == data.province)?.name_th || data.province;
-                        const districtName = amphures.find(a => a.id == data.district)?.name_th || data.district;
-                        const subdistrictName = tambons.find(t => t.id == data.subdistrict)?.name_th || data.subdistrict;
-
-                        const div = document.createElement("div");
-                        div.classList.add("address-card");
-
-                        div.innerHTML = `
-                        <div class="address-item">
-                            <div class="address-header">
-                            <span>${data.fullName}</span>
-                            <span class="address-phone">${data.phone}</span>
-                            </div>
-                            <div class="address-detail">
-                            ${data.detail}<br/>
-                            ${subdistrictName}, ${districtName}, ${provinceName} ${data.zipcode}
-                            </div>
-                            <div class="address-actions">
-                            <button onclick="editAddress('${doc.id}', '${data.fullName}', '${data.phone}', '${data.province}', '${data.district}', '${data.subdistrict}', '${data.zipcode}', '${data.detail}')">Edit</button>
-                            <button onclick="deleteAddress('${doc.id}')">Delete</button>
-                            </div>
-                        </div>
-                        `;
-                        cardList.appendChild(div);
-                    });
-                });
-        }
-
-
-        // Auth state listener
-        auth.onAuthStateChanged(user => {
-        if (user) {
-            document.getElementById("loading").style.display = "none";
-            document.getElementById("card-content").style.display = "block";
-            loadUserAddresses();
-        } else {
-            document.getElementById("loading").textContent = "Please log in to view your addresses.";
-            document.getElementById("card-content").style.display = "none";
-        }
+      db.collection("users").doc(user.uid).collection("addresses")
+        .orderBy("createdAt","desc")
+        .onSnapshot(snapshot=>{
+          cardList.innerHTML = "";
+          if(snapshot.empty){
+            cardList.innerHTML = "<p>No addresses found.</p>";
+            return;
+          }
+          snapshot.forEach(doc=>{
+            const addr = doc.data();
+            const div = document.createElement("div");
+            div.classList.add("address-card");
+            div.innerHTML = `
+              <p><strong>${addr.fullname}</strong> ${addr.isDefault ? '(Default)' : ''}</p>
+              <p>${addr.addressInfo}</p>
+              <p>${addr.detail}</p>
+              <p>${addr.phoneno}</p>
+            `;
+            cardList.appendChild(div);
+          });
         });
+    }
 
-        const provinceSelect = document.getElementById("province");
-        const districtSelect = document.getElementById("district");
-        const subdistrictSelect = document.getElementById("subdistrict");
-        const zipcodeSelect = document.getElementById("zipcode");
-        const addressDetailInput = document.getElementById("address-detail");
-        const dropdownContainer = document.getElementById("address-dropdown");
-    
-        let provinces = [];
-        let amphures = [];
-        let tambons = [];
-    
-        async function loadAddressData() {
-        try {
-            const [provRes, amphRes, tambRes] = await Promise.all([
-            fetch("../data/thai_provinces.json"),
-            fetch("../data/thai_amphures.json"),
-            fetch("../data/thai_tambons.json"),
-            ]);
-            provinces = await provRes.json();
-            amphures = await amphRes.json();
-            tambons = await tambRes.json();
-    
-            provinces.forEach(province => {
-            const opt = document.createElement("option");
-            opt.value = province.id;
-            opt.textContent = province.name_th;
-            provinceSelect.appendChild(opt);
-            });
-        } catch (err) {
-            console.error("Error loading address data:", err);
-        }
-        }
-    
-        provinceSelect.addEventListener("change", () => {
-        districtSelect.innerHTML = '<option value="" disabled selected>District</option>';
-        subdistrictSelect.innerHTML = '<option value="" disabled selected>Sub District</option>';
-        zipcodeSelect.innerHTML = '<option value="" disabled selected>Postal Code</option>';
-    
-        const selectedProvinceId = provinceSelect.value;
-        const filteredDistricts = amphures.filter(d => d.province_id == selectedProvinceId);
-    
-        filteredDistricts.forEach(district => {
-            const opt = document.createElement("option");
-            opt.value = district.id;
-            opt.textContent = district.name_th;
-            districtSelect.appendChild(opt);
+    // Auth listener
+    auth.onAuthStateChanged(user=>{
+      if(user){
+        document.getElementById("loading").style.display="none";
+        document.getElementById("card-content").style.display="block";
+        loadUserAddresses();
+      } else {
+        document.getElementById("loading").textContent="Please log in to view your addresses.";
+        document.getElementById("card-content").style.display="none";
+      }
+
+      // Logout
+      const logoutBtn = document.getElementById("logout-btn");
+      if(logoutBtn){
+        logoutBtn.addEventListener("click", ()=> auth.signOut().then(()=> window.location.href="../login.html"));
+      }
+    });
+
+    const cartCountEl = document.getElementById("cart-count");
+    let currentUser = null; // เพิ่มตรงนี้ถ้ายังไม่มี
+    function updateCartCount() {
+      if(!currentUser || !cartCountEl) return;
+      db.collection("carts").doc(currentUser.uid).collection("items")
+        .onSnapshot(snapshot => {
+          let total = 0;
+          snapshot.forEach(doc => total += doc.data().quantity || 0);
+          cartCountEl.innerText = total;
         });
-        });
-    
-        districtSelect.addEventListener("change", () => {
-        subdistrictSelect.innerHTML = '<option value="" disabled selected>Sub District</option>';
-        zipcodeSelect.innerHTML = '<option value="" disabled selected>Postal Code</option>';
-    
-        const selectedDistrictId = districtSelect.value;
-        const filteredSubdistricts = tambons.filter(t => t.amphure_id == selectedDistrictId);
-    
-        filteredSubdistricts.forEach(sub => {
-            const opt = document.createElement("option");
-            opt.value = sub.id;
-            opt.textContent = sub.name_th;
-            opt.setAttribute("data-zipcode", sub.zip_code);
-            subdistrictSelect.appendChild(opt);
-        });
-        });
-    
-        subdistrictSelect.addEventListener("change", () => {
-        zipcodeSelect.innerHTML = '<option value="" disabled selected>Postal Code</option>';
-    
-        const selectedSub = subdistrictSelect.options[subdistrictSelect.selectedIndex];
-        const zip = selectedSub.getAttribute("data-zipcode");
-    
-        if (zip) {
-            const opt = document.createElement("option");
-            opt.value = zip;
-            opt.textContent = zip;
-            zipcodeSelect.appendChild(opt);
-            zipcodeSelect.value = zip;
-    
-            // Display in read-only input
-            const provinceName = provinces.find(p => p.id == provinceSelect.value)?.name_th || "";
-            const districtName = amphures.find(d => d.id == districtSelect.value)?.name_th || "";
-            const subName = selectedSub.textContent;
-    
-            addressDetailInput.value = `${subName}, ${districtName}, ${provinceName}, ${zip}`;
-            dropdownContainer.style.display = "none";
-        }
-        });
-    
-        addressDetailInput.addEventListener("click", () => {
-        dropdownContainer.style.display = "block";
-        });
-        
-        function toggleDropdown() {
-            const dropdownContainer = document.getElementById("address-dropdown");
-            if (dropdownContainer.style.display === "none" || dropdownContainer.style.display === "") {
-                dropdownContainer.style.display = "block";
-            } else {
-                dropdownContainer.style.display = "none";
-            }
-        }
+    }
 
-        let editingAddressId = null;
-
-        function editAddress(id, fullName, phone, province, district, subdistrict, zipcode, detail) {
-            editingAddressId = id;
-            document.getElementById("fullname").value = fullName;
-            document.getElementById("phoneno").value = phone;
-            document.getElementById("province").value = province;
-            document.getElementById("district").value = district;
-            document.getElementById("subdistrict").value = subdistrict;
-            document.getElementById("zipcode").value = zipcode;
-            document.getElementById("detail").value = detail;
-
-            showCardForm();
-        }
-
-        function deleteAddress(id) {
-            const user = auth.currentUser;
-            if (!user) return;
-
-            if (confirm("Are you sure you want to delete this address?")) {
-                db.collection("users").doc(user.uid).collection("addresses").doc(id).delete()
-                    .then(() => {
-                        alert("Address deleted successfully.");
-                        loadUserAddresses();
-                    })
-                    .catch(error => {
-                        console.error("Error deleting address:", error);
-                        alert("Failed to delete address.");
-                    });
-            }
-        }
-
-        loadAddressData();
   </script>
 </body>
 </html>

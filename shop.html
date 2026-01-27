@@ -1,21 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Shop Page</title>
-  <link rel="stylesheet" href="shop.css">
+  <link rel="stylesheet" href="shop.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
 </head>
 <body>
-  <!-- Navigation Bar -->
+  <!-- Navigation -->
   <nav class="navbar">
     <div class="logo">
       <img src="images/logo433.png" alt="DES403 Logo" class="logo-img">
       <span class="logo-text"> CSS MALL</span>
     </div>
     <ul class="nav-links">
-      <li><a href="home.html" class="active">Home</a></li>
-      <li><a href="shop.html">Shop</a></li>
+      <li><a href="home.html">Home</a></li>
+      <li><a href="shop.html" class="active">Shop</a></li>
       <li><a href="coupon.html">Coupon</a></li>
       <li class="dropdown">
         <a href="#" class="dropbtn">My account</a>
@@ -24,42 +27,38 @@
           <a href="myshop.html">My Shop</a>
           <a href="login.html" id="logout-btn" class="logout-btn">Logout</a>
         </div>
-      </li> 
+      </li>
       <li>
         <a href="cart.html">
-            <img src="images/shopping-cart.png" alt="Cart" class="cart-icon">
+          <img src="images/shopping-cart.png" class="cart-icon">
+          <span id="cart-count" class="cart-count-badge">0</span>
         </a>
-      </li>  
+      </li>
     </ul>
   </nav>
 
-  <!-- Hero Section -->
+  <!-- Hero -->
   <header class="hero-section">
     <div class="hero-content">
       <h1>Shop</h1>
-      <p id="breadcrumb">Home > <span id="current-page">Shop</span></p>
+      <p id="breadcrumb">Home > <span>Shop</span></p>
     </div>
     <a href="#"><img src="images/Rectangle 1.png" alt="User"></a>
     <div class="search-container">
       <input type="text" id="search-input" placeholder="Search for products, brands and shops">
       <button id="search-btn">🔍</button>
     </div>
-  </header>  
+  </header>
 
-  <!-- Filter and Sort Section -->
+  <!-- Filter & Sort -->
   <section class="filter-sort">
     <div class="filter-options">
       <button class="filter-button active" data-filter="popular">Popular</button>
       <button class="filter-button" data-filter="latest">Latest</button>
       <button class="filter-button" data-filter="top-sales">Top Sales</button>
     </div>
-    <span>Showing 1–16 of 32 results</span>
+    <span id="result-count">Showing products...</span>
     <div class="sort-options">
-      <label for="show">Show</label>
-      <select id="show">
-        <option value="16">16</option>
-        <option value="32">32</option>
-      </select>
       <label for="sort">Sort by</label>
       <select id="sort">
         <option value="default">Default</option>
@@ -67,19 +66,14 @@
         <option value="price-high">Price: High to Low</option>
       </select>
     </div>
-  </section>  
-
-  <!-- Product Grid Section -->
-  <section id="product-grid" class="product-grid">
-    <!-- Products will be dynamically loaded here -->
   </section>
-  
-  <!-- Pagination Section -->
-  <div class="pagination" id="pagination">
-    <!-- Add more buttons if necessary -->
-  </div>
 
-  <script src="product.js"></script> <!-- Your existing JS file -->
+  <!-- Product Grid -->
+  <section id="product-grid" class="product-grid">
+    <!-- Products loaded dynamically -->
+  </section>
+
+  <div class="pagination" id="pagination"></div>
 
   <!-- Footer -->
   <footer class="footer">
@@ -90,41 +84,157 @@
       <div><i class="icon-support"></i> 24/7 Support</div>
     </div>
     <div class="footer-links">
-      <p>Funiro © 2023. All rights reserved.</p>
+      <p>© 2026 CSS Mall. &nbsp;&nbsp;&nbsp; All Rights Reserved.</p>
     </div>
   </footer>
 
   <script>
-    // Search functionality
-    document.getElementById("search-btn").addEventListener("click", function() {
-      const query = document.getElementById("search-input").value.toLowerCase();
-      const products = document.querySelectorAll(".product-card");
-  
-      products.forEach(product => {
-        const productName = product.querySelector(".product-info h3").innerText.toLowerCase();
-        product.style.display = productName.includes(query) ? "block" : "none";
+    const firebaseConfig = {
+      apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
+      authDomain: "mini-ecom-39979.firebaseapp.com",
+      projectId: "mini-ecom-39979",
+      storageBucket: "mini-ecom-39979.firebasestorage.app",
+      messagingSenderId: "43435045240",
+      appId: "1:43435045240:web:ba425c522e37b4c1a7d88d"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    let currentUser = null;
+    const cartCountEl = document.getElementById("cart-count");
+    const productGrid = document.getElementById("product-grid");
+    const resultCount = document.getElementById("result-count");
+    const searchInput = document.getElementById("search-input");
+    const searchBtn = document.getElementById("search-btn");
+    const sortSelect = document.getElementById("sort");
+    const filterButtons = document.querySelectorAll(".filter-button");
+
+    let allProducts = [];
+
+    auth.onAuthStateChanged(user => {
+      if(user){
+        currentUser = user;
+        listenToCartChanges();
+      } else {
+        currentUser = null;
+        cartCountEl.innerText = "0";
+      }
+    });
+
+    function listenToCartChanges() {
+      if(!currentUser) return;
+      db.collection("carts").doc(currentUser.uid)
+        .collection("items")
+        .onSnapshot(snapshot => {
+          let total = 0;
+          snapshot.forEach(doc => total += doc.data().quantity || 0);
+          cartCountEl.innerText = total;
+        });
+    }
+
+    async function fetchProducts(filter = "popular") {
+      let query = db.collection("products");
+
+      if(filter === "latest") query = query.orderBy("createdAt", "desc");
+      else if(filter === "top-sales") query = query.orderBy("sales", "desc");
+      else query = query.orderBy("name"); // default order
+
+      const snapshot = await query.get();
+      allProducts = snapshot.docs.map(doc => {
+        return { id: doc.id, ...doc.data() };
+      });
+      renderProducts(allProducts);
+    }
+
+    function renderProducts(products) {
+      productGrid.innerHTML = "";
+      if(products.length === 0){
+        resultCount.innerText = "0 products found";
+        return;
+      }
+      products.forEach(p => {
+        const card = document.createElement("div");
+        card.classList.add("product-card");
+        card.innerHTML = `
+          <img src="${p.imageUrl || 'images/placeholder.jpg'}" alt="${p.name}" />
+          <div class="product-info">
+            <h3>${p.name}</h3>
+            <p>${p.description || ''}</p>
+            <p class="price">CNY ${p.price}</p>
+            <div class="product-buttons">
+              <button onclick="addToCart('${p.id}')">Add to Cart</button>
+              <button onclick="buyNow('${p.id}')">Buy Now</button>
+            </div>
+          </div>
+        `;
+        productGrid.appendChild(card);
+      });
+      resultCount.innerText = `${products.length} products found`;
+    }
+    db.collection("products").orderBy("name").onSnapshot(snapshot=>{
+      allProducts = snapshot.docs.map(doc=>({ id: doc.id, ...doc.data() }));
+      renderProducts(allProducts);
+    });
+
+    function addToCart(productId){
+      if(!currentUser){ alert("Please log in first."); return; }
+      const ref = db.collection("carts").doc(currentUser.uid)
+        .collection("items").doc(productId);
+      ref.get().then(doc => {
+        if(doc.exists){
+          return ref.update({ quantity: doc.data().quantity + 1 });
+        } else {
+          return ref.set({ quantity: 1 });
+        }
+      }).then(()=> alert("Added to cart!"))
+      .catch(err=> alert(err.message));
+    }
+
+    function buyNow(productId){
+      if(!currentUser){ alert("Please log in first."); return; }
+      const ref = db.collection("carts").doc(currentUser.uid)
+        .collection("items").doc(productId);
+      ref.get().then(doc => {
+        if(doc.exists){
+          return ref.update({ quantity: doc.data().quantity + 1 });
+        } else {
+          return ref.set({ quantity: 1 });
+        }
+      }).then(()=> window.location.href="cart.html")
+      .catch(err=> alert(err.message));
+    }
+
+    searchBtn.addEventListener("click", ()=> {
+      const q = searchInput.value.toLowerCase();
+      const filtered = allProducts.filter(p => p.name.toLowerCase().includes(q));
+      renderProducts(filtered);
+    });
+    searchInput.addEventListener("keydown", e => { if(e.key==="Enter") searchBtn.click(); });
+
+    sortSelect.addEventListener("change", ()=> {
+      const sortValue = sortSelect.value;
+      if(sortValue==="price-low"){
+        allProducts.sort((a,b)=> a.price - b.price);
+      } else if(sortValue==="price-high"){
+        allProducts.sort((a,b)=> b.price - a.price);
+      }
+      renderProducts(allProducts);
+    });
+
+    filterButtons.forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        filterButtons.forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+        fetchProducts(btn.dataset.filter);
       });
     });
-  </script>
 
-  <script>
-    // Reload page when clicking the logo
-    document.getElementById("logo").addEventListener("click", function() {
-      location.reload();
+    document.getElementById("logout-btn").addEventListener("click", ()=>{
+      auth.signOut().then(()=> window.location.href="login.html");
     });
-  </script>
 
-  <script>
-    function reloadPage() {
-      window.location.href = "shop.html";  // Redirects to the home page
-    }
-  </script>
-
-  <!-- Logout functionality (redirection to login page) -->
-  <script>
-    document.getElementById('logout-btn').addEventListener('click', function() {
-      window.location.href = 'login.html';  // Redirect to login page on logout
-    });
+    fetchProducts();
   </script>
 </body>
 </html>

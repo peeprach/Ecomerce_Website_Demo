@@ -57,12 +57,12 @@
                             <li><a href="../acc.html" >Profile</a></li>
                             <li><a href="../customer/bank.html">Banks & Cards</a></li>
                             <li><a href="../customer/address.html">Addresses</a></li>
-                            <li><a href="#">Change Password</a></li>
+                            <li><a href="../customer/change.html">Change Password</a></li>
                             <li><a href="#">Privacy Settings</a></li>
                             <li><a href="#">Notification Settings</a></li>
                         </ul>
                     </li>                    
-                    <li><a href="#" style="margin-top: 10px;"><img src="../images/purchase.png" class="icon"> My Purchase</a></li>
+                    <li><a href="../customer/my-purchase.html" style="margin-top: 10px;"><img src="../images/purchase.png" class="icon"> My Purchase</a></li>
                     <li><a href="#"><img src="../images/notic.png" class="icon"> Notification</a></li>
                 </ul>
             </nav>
@@ -80,100 +80,125 @@
 
             <div id="card-form" style="display: none;">
                 <h3>Add New Credit Card</h3>
+                <hr>
                 <input type="text" id="card-number" placeholder="Card Number" maxlength="16" required>
                 <input type="text" id="card-holder" placeholder="Cardholder Name" required>
                 <input type="text" id="expiry-date" placeholder="MM/YY" maxlength="5" required>
                 <input type="password" id="cvv" placeholder="CVV" maxlength="3" required>
-                <button onclick="saveCard()">Save Card</button>
-                <button onclick="hideCardForm()">Cancel</button>
+                <div class="btn-group">
+                    <button onclick="saveCard()">Save Card</button>
+                    <button onclick="hideCardForm()">Cancel</button>
+                </div>
             </div>
         </main>
     </div>
 
     <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyCogse_Ke5U0xzdFoiQDv-85AzhMKnieCw",
-            authDomain: "des400-d3feb.firebaseapp.com",
-            projectId: "des400-d3feb",
-            storageBucket: "des400-d3feb.appspot.com",
-            messagingSenderId: "1063674569994",
-            appId: "1:1063674569994:web:525070c6d1500d93a806f3",
-            measurementId: "G-DW42H6ES0R"
-        };
+  // ✅ Firebase NEW project
+  const firebaseConfig = {
+    apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
+    authDomain: "mini-ecom-39979.firebaseapp.com",
+    projectId: "mini-ecom-39979",
+    storageBucket: "mini-ecom-39979.firebasestorage.app",
+    messagingSenderId: "43435045240",
+    appId: "1:43435045240:web:ba425c522e37b4c1a7d88d"
+  };
 
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
+  // Initialize Firebase (ป้องกัน init ซ้ำ)
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
 
-        function loadCards(user) {
-            if (!user) {
-                document.getElementById("loading").innerText = "Please log in to view your cards.";
-                return;
-            }
+  const auth = firebase.auth();
+  const db = firebase.firestore();
 
-            const cardListContainer = document.getElementById('card-list');
-            cardListContainer.innerHTML = "";
-            db.collection("users").doc(user.uid).collection("cards").onSnapshot(snapshot => {
-                cardListContainer.innerHTML = "";
-                if (snapshot.empty) {
-                    cardListContainer.innerHTML = "<p>You don't have any cards yet.</p>";
-                } else {
-                    snapshot.docs.forEach(doc => {
-                        const card = doc.data();
-                        const cardElement = document.createElement("div");
-                        cardElement.innerHTML = `<div>Card: **** **** **** ${card.cardNumber.slice(-4)}</div>`;
-                        cardListContainer.appendChild(cardElement);
-                    });
-                }
-                document.getElementById("loading").style.display = "none";
-                document.getElementById("card-content").style.display = "block";
-            }, error => {
-                console.error("Error fetching cards:", error);
-            });
+  function loadCards(user) {
+    if (!user) {
+      document.getElementById("loading").innerText = "Please log in to view your cards.";
+      return;
+    }
+
+    const cardListContainer = document.getElementById('card-list');
+    cardListContainer.innerHTML = "";
+
+    db.collection("users")
+      .doc(user.uid)
+      .collection("cards")
+      .onSnapshot(snapshot => {
+        cardListContainer.innerHTML = "";
+
+        if (snapshot.empty) {
+          cardListContainer.innerHTML = "<p>You don't have any cards yet.</p>";
+        } else {
+          snapshot.docs.forEach(doc => {
+            const card = doc.data();
+            const cardElement = document.createElement("div");
+            cardElement.innerHTML = `
+              <div>Card: **** **** **** ${card.cardNumber.slice(-4)}</div>
+            `;
+            cardListContainer.appendChild(cardElement);
+          });
         }
 
-        auth.onAuthStateChanged(user => {
-            loadCards(user);
-        });
+        document.getElementById("loading").style.display = "none";
+        document.getElementById("card-content").style.display = "block";
+      }, error => {
+        console.error("Error fetching cards:", error);
+      });
+  }
 
-        function showCardForm() {
-            document.getElementById("card-form").style.display = "block";
-        }
+  auth.onAuthStateChanged(user => {
+    loadCards(user);
+  });
 
-        function hideCardForm() {
-            document.getElementById("card-form").style.display = "none";
-        }
+  function showCardForm() {
+    document.getElementById("card-form").style.display = "block";
+  }
 
-        function saveCard() {
-            const user = auth.currentUser;
-            if (!user) {
-                alert("Please log in first!");
-                return;
-            }
+  function hideCardForm() {
+    document.getElementById("card-form").style.display = "none";
+  }
 
-            const cardNumber = document.getElementById("card-number").value;
-            const cardHolder = document.getElementById("card-holder").value;
-            const expiryDate = document.getElementById("expiry-date").value;
-            const cvv = document.getElementById("cvv").value;
+  function saveCard() {
+    const user = auth.currentUser;
+    if (!user) {
+      alert("Please log in first!");
+      return;
+    }
 
-            if (cardNumber.length !== 16 || cvv.length !== 3 || !expiryDate.match(/^(0[1-9]|1[0-2])\/([0-9]{2})$/)) {
-                alert("Please enter valid card details.");
-                return;
-            }
+    const cardNumber = document.getElementById("card-number").value;
+    const cardHolder = document.getElementById("card-holder").value;
+    const expiryDate = document.getElementById("expiry-date").value;
+    const cvv = document.getElementById("cvv").value;
 
-            db.collection("users").doc(user.uid).collection("cards").add({
-                cardNumber: cardNumber,
-                cardHolder: cardHolder,
-                expiryDate: expiryDate,
-                addedAt: firebase.firestore.FieldValue.serverTimestamp()
-            }).then(() => {
-                alert("Card added successfully!");
-                hideCardForm();
-            }).catch(error => {
-                console.error("Error adding card:", error);
-                alert("Failed to add card.");
-            });
-        }
-    </script>
+    if (
+      cardNumber.length !== 16 ||
+      cvv.length !== 3 ||
+      !expiryDate.match(/^(0[1-9]|1[0-2])\/([0-9]{2})$/)
+    ) {
+      alert("Please enter valid card details.");
+      return;
+    }
+
+    db.collection("users")
+      .doc(user.uid)
+      .collection("cards")
+      .add({
+        cardNumber,
+        cardHolder,
+        expiryDate,
+        addedAt: firebase.firestore.FieldValue.serverTimestamp()
+      })
+      .then(() => {
+        alert("Card added successfully!");
+        hideCardForm();
+      })
+      .catch(error => {
+        console.error("Error adding card:", error);
+        alert("Failed to add card.");
+      });
+  }
+</script>
+
 </body>
 </html>

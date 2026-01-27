@@ -346,3 +346,16 @@ hr.section-divider {
     color: white;
     font-weight: bold;
 }
+#key-metrics > div {
+    border: 1px solid #ccc;      
+    border-radius: 8px;          
+    padding: 5px 16px;          
+    background-color: #fafafa;  
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1); 
+    text-align: center;         
+}
+#key-metrics span,
+#key-metrics small {
+    font-size: 12px;
+}
+  

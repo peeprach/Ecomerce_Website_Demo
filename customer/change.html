@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banks & Cards</title>
+    <link rel="stylesheet" href="../customer/change.css">
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="logo">
+          <img src="../images/logo433.png" alt="DES403 Logo" class="logo-img">
+          <span class="logo-text"> CSS MALL</span>
+        </div>
+        <ul class="nav-links">
+            <li><a href="../home.html">Home</a></li>
+            <li><a href="../shop.html">Shop</a></li>
+            <li><a href="../coupon.html">Coupon</a></li>
+          <li class="dropdown">
+            <a href="#" class="dropbtn">My account</a>
+            <div class="dropdown-content">
+              <a href="../acc.html">My Profile</a>
+              <a href="../myshop.html">My Shop</a>
+              <a href="../login.html" id="logout-btn" class="logout-btn">Logout</a>
+            </div>
+          </li> 
+          <li>
+            <a href="cart.html">
+                <img src="../images/shopping-cart.png" alt="Cart" class="cart-icon">
+            </a>
+          </li>  
+        </ul>
+      </nav>
+
+    <!-- Account Section -->
+    <div class="container">
+        <!-- Left Sidebar -->
+        <aside class="sidebar">
+            <div class="profile-section">
+                <label for="profile-pic-input">
+                    <img id="profile-pic" src="/images/user-pro.png" alt="Profile Picture" class="profile-pic">
+                </label>
+                <button class="edit-profile" onclick="uploadProfilePicture()">Edit Profile</button>
+                <input type="file" id="profile-pic-input" accept="image/*" style="display: none;">
+            </div>
+    
+            <nav class="menu">
+                <ul>
+                    <li id="account-menu">
+                        <a href="#" onclick="toggleSubmenu(event)">
+                            <img src="../images/user.png" class="icon"> My Account
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="../acc.html" >Profile</a></li>
+                            <li><a href="../customer/bank.html">Banks & Cards</a></li>
+                            <li><a href="../customer/address.html">Addresses</a></li>
+                            <li><a href="../customer/change.html">Change Password</a></li>
+                            <li><a href="#">Privacy Settings</a></li>
+                            <li><a href="#">Notification Settings</a></li>
+                        </ul>
+                    </li>                    
+                    <li><a href="../customer/my-purchase.html" style="margin-top: 10px;"><img src="../images/purchase.png" class="icon"> My Purchase</a></li>
+                    <li><a href="#"><img src="../images/notic.png" class="icon"> Notification</a></li>
+                </ul>
+            </nav>
+        </aside>
+        <!-- Main Content -->
+        <main class="main-content">
+            <h2>Change Password</h2>
+            <p class="profile-subtitle" id="user-email">Enter a new password for </p>
+            <div class="password-form">
+                <input type="password" id="new-password" placeholder="New Password" required>
+                <input type="password" id="confirm-password" placeholder="Confirm New Password" required>
+                <div class="btn-row">
+                    <button class="btn-confirm" onclick="changePassword()">Change Password</button>
+                </div>
+                <p id="status-msg" style="color:red; margin-top:10px;"></p>
+            </div>
+        </main>
+    </div>
+   
+   <script>
+    // Firebase config
+    const firebaseConfig = {
+        apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
+        authDomain: "mini-ecom-39979.firebaseapp.com",
+        projectId: "mini-ecom-39979",
+        storageBucket: "mini-ecom-39979.firebasestorage.app",
+        messagingSenderId: "43435045240",
+        appId: "1:43435045240:web:ba425c522e37b4c1a7d88d"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+
+    // แสดง email ของผู้ใช้อัตโนมัติ
+    auth.onAuthStateChanged(user => {
+        const emailElem = document.getElementById("user-email");
+        const statusMsg = document.getElementById("status-msg");
+        if(user){
+            emailElem.textContent = `Enter a new password for ${user.email}`;
+        } else {
+            emailElem.textContent = "Please log in first!";
+            statusMsg.textContent = "";
+        }
+    });
+
+    // เปลี่ยน password
+    function changePassword(){
+        const user = auth.currentUser;
+        const newPassword = document.getElementById("new-password").value;
+        const confirmPassword = document.getElementById("confirm-password").value;
+        const statusMsg = document.getElementById("status-msg");
+
+        if(!user){
+            statusMsg.textContent = "You must be logged in!";
+            return;
+        }
+
+        if(newPassword.length < 6){
+            statusMsg.textContent = "Password must be at least 6 characters.";
+            return;
+        }
+
+        if(newPassword !== confirmPassword){
+            statusMsg.textContent = "Passwords do not match!";
+            return;
+        }
+
+        // Firebase update password
+        user.updatePassword(newPassword)
+        .then(()=>{
+            statusMsg.style.color = "green";
+            statusMsg.textContent = "Password changed successfully!";
+            document.getElementById("new-password").value = "";
+            document.getElementById("confirm-password").value = "";
+        })
+        .catch(error=>{
+            statusMsg.style.color = "red";
+            statusMsg.textContent = error.message;
+        });
+    }
+    </script>
+</body>
+</html>

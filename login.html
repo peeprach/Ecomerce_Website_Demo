@@ -24,7 +24,7 @@
     <!-- Left Side (Logo) -->
     <div class="left-side">
       <img src="images/logo433.png" alt="CSS MALL Logo" class="large-logo">
-      <h2>แหล่งช้อปปิ้งออนไลน์ที่ดีที่สุด</h2>
+      <h2>The best online shopping destinations.</h2>
     </div>
 
     <div class="login-form">
@@ -37,14 +37,17 @@
         <button type="submit" class="btn-login">LOG IN</button>
         <p>Don't have an account? <a href="signup.html"> Sign Up</a></p>
         <p style="margin-top:30px">Or, login with</p>
-        <button class="btn-login-with-icon btn-google">
-          <img src="images/google.png" alt="Google Icon"> Sign in with Google
+        
+        <button type="button" class="btn-login-with-icon btn-google">
+          <img src="images/google.png"> Sign in with Google
         </button>
-        <button class="btn-login-with-icon btn-apple">
-          <img src="images/apple.png" alt="Apple Icon"> Sign in with Apple
+
+        <button type="button" class="btn-login-with-icon btn-apple">
+          <img src="images/apple.png"> Sign in with Apple
         </button>
-        <button class="btn-login-with-icon btn-phone">
-          <img src="images/phone.png" alt="Phone Icon"> Sign in with Phone
+
+        <button type="button" class="btn-login-with-icon btn-phone">
+          <img src="images/phone.png"> Sign in with Phone
         </button>
         <p id="login-message"></p>
         <div id="recaptcha-container"></div>
@@ -52,104 +55,92 @@
     </div>
   </section>
 
-  <!-- Firebase Configuration and Script -->
   <script>
-    // Your Firebase configuration
-    const firebaseConfig = {
-    apiKey: "AIzaSyCogse_Ke5U0xzdFoiQDv-85AzhMKnieCw",
-    authDomain: "des400-d3feb.firebaseapp.com",
-    projectId: "des400-d3feb",
-    storageBucket: "des400-d3feb.firebasestorage.app",
-    messagingSenderId: "1063674569994",
-    appId: "1:1063674569994:web:525070c6d1500d93a806f3",
-    measurementId: "G-DW42H6ES0R"
+  // ✅ Firebase NEW project
+  const firebaseConfig = {
+    apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
+    authDomain: "mini-ecom-39979.firebaseapp.com",
+    projectId: "mini-ecom-39979",
+    storageBucket: "mini-ecom-39979.firebasestorage.app",
+    messagingSenderId: "43435045240",
+    appId: "1:43435045240:web:ba425c522e37b4c1a7d88d"
   };
 
-    // Initialize Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
 
-    // Handle Login
-    document.getElementById('login-form').addEventListener('submit', (e) => {
-      e.preventDefault(); // Prevent default form submission
+  // ===== Email / Password Login =====
+  document.getElementById('login-form').addEventListener('submit', (e) => {
+    e.preventDefault();
 
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const loginMessage = document.getElementById('login-message');
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const loginMessage = document.getElementById('login-message');
 
-      // Sign in with Firebase Authentication
-      auth.signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          // Success: Redirect to shop.html
-          const user = userCredential.user;
-          loginMessage.style.color = "green";
-          loginMessage.innerText = "Login successful! Redirecting...";
-          console.log("Logged in as:", user.email);
-          setTimeout(() => {
-            window.location.href = "shop.html"; // Redirect after successful login
-          }, 1500);
-        })
-        .catch((error) => {
-          // Error handling
-          loginMessage.style.color = "red";
-          loginMessage.innerText = error.message;
-          console.error("Login error:", error);
-        });
-    });
+    loginMessage.innerText = "";
 
-    // Google Login
-    document.querySelector('.btn-google').addEventListener('click', () => {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      auth.signInWithPopup(provider)
-        .then((result) => {
-          console.log("Google Sign-in successful:", result.user);
+    auth.signInWithEmailAndPassword(email, password)
+      .then((userCredential) => {
+        loginMessage.style.color = "green";
+        loginMessage.innerText = "Login successful! Redirecting...";
+        setTimeout(() => {
           window.location.href = "shop.html";
-        })
-        .catch((error) => {
-          document.getElementById('login-message').innerText = error.message;
-          console.error("Google Sign-in error:", error);
-        });
-    });
-
-    // Apple Login
-    document.querySelector('.btn-apple').addEventListener('click', () => {
-      const provider = new firebase.auth.OAuthProvider('apple.com');
-      auth.signInWithPopup(provider)
-        .then((result) => {
-          console.log("Apple Sign-in successful:", result.user);
-          window.location.href = "shop.html";
-        })
-        .catch((error) => {
-          document.getElementById('login-message').innerText = error.message;
-          console.error("Apple Sign-in error:", error);
-        });
-    });
-
-    // Phone Login
-    document.querySelector('.btn-phone').addEventListener('click', () => {
-      const phoneNumber = prompt("Enter your phone number (e.g. +66812345678):");
-      const appVerifier = new firebase.auth.RecaptchaVerifier('login-message', {
-        'size': 'invisible',
-        'callback': (response) => {
-          console.log("reCAPTCHA verified");
-        }
+        }, 1500);
+      })
+      .catch((error) => {
+        loginMessage.style.color = "red";
+        loginMessage.innerText = error.message;
       });
+  });
 
-      auth.signInWithPhoneNumber(phoneNumber, appVerifier)
-        .then((confirmationResult) => {
-          const otpCode = prompt("Enter the OTP sent to your phone:");
-          return confirmationResult.confirm(otpCode);
-        })
-        .then((result) => {
-          console.log("Phone Sign-in successful:", result.user);
-          window.location.href = "shop.html";
-        })
-        .catch((error) => {
-          document.getElementById('login-message').innerText = error.message;
-          console.error("Phone Sign-in error:", error);
-        });
-    });
-        
-  </script>
+  // ===== Google Login =====
+  document.querySelector('.btn-google').addEventListener('click', () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    
+    auth.signInWithPopup(provider)
+      .then(() => {
+        window.location.href = "shop.html";
+      })
+      .catch((error) => {
+        document.getElementById('login-message').innerText = error.message;
+      });
+  });
+
+  // ===== Apple Login =====
+  document.querySelector('.btn-apple').addEventListener('click', () => {
+    const provider = new firebase.auth.OAuthProvider('apple.com');
+
+    auth.signInWithPopup(provider)
+      .then(() => {
+        window.location.href = "shop.html";
+      })
+      .catch((error) => {
+        document.getElementById('login-message').innerText = error.message;
+      });
+  });
+
+  // ===== Phone Login =====
+  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier(
+    'recaptcha-container',
+    { size: 'invisible' }
+  );
+
+  document.querySelector('.btn-phone').addEventListener('click', () => {
+    const phoneNumber = prompt("Enter phone number (e.g. +66812345678)");
+
+    auth.signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
+      .then((confirmationResult) => {
+        const otp = prompt("Enter OTP");
+        return confirmationResult.confirm(otp);
+      })
+      .then(() => {
+        window.location.href = "shop.html";
+      })
+      .catch((error) => {
+        document.getElementById('login-message').innerText = error.message;
+      });
+  });
+</script>
 </body>
 </html>

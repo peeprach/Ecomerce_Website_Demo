@@ -1,110 +1,405 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>My Purchases</title>
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Purchases — CSS Mall</title>
+  <link rel="stylesheet" href="../css/global.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+  <style>
+    body { background: var(--light); }
 
-<link rel="stylesheet" href="my-purchase.css">
+    /* Hero */
+    .page-hero { background:linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%); padding:40px 48px 36px; color:#fff; }
+    .page-hero h1 { font-size:28px; font-weight:800; margin-bottom:4px; }
+    .page-hero p  { font-size:13px; color:rgba(255,255,255,.55); font-weight:400; }
 
-<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+    /* Filter tabs */
+    .filter-bar { background:var(--white); border-bottom:1px solid #f0f0f0; padding:0 48px; display:flex; gap:4px; overflow-x:auto; scrollbar-width:none; }
+    .filter-bar::-webkit-scrollbar { display:none; }
+    .filter-tab { padding:14px 20px; border:none; background:none; font-size:14px; font-weight:600; color:var(--muted); cursor:pointer; font-family:var(--font); white-space:nowrap; position:relative; transition:color .2s; }
+    .filter-tab.active { color:var(--brand-dark); }
+    .filter-tab.active::after { content:""; position:absolute; bottom:0; left:0; right:0; height:2px; background:var(--brand); }
+
+    /* Content */
+    .orders-wrap { max-width:900px; margin:28px auto; padding:0 24px 60px; }
+
+    /* Order card */
+    .order-card {
+      background:var(--white); border-radius:var(--radius-xl);
+      box-shadow:var(--shadow); margin-bottom:20px; overflow:hidden;
+    }
+
+    /* Order header */
+    .order-head {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:16px 24px; border-bottom:1px solid #f3f4f6; flex-wrap:wrap; gap:8px;
+    }
+    .order-head-left { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+    .order-id { font-size:13px; font-weight:700; color:var(--dark); font-family:monospace; }
+    .order-date { font-size:12px; color:var(--muted); }
+    .status-badge {
+      display:inline-flex; align-items:center; gap:4px;
+      padding:4px 12px; border-radius:99px; font-size:12px; font-weight:700;
+    }
+    .status-pending   { background:#fff7ed; color:#c2410c; }
+    .status-processing{ background:#eff6ff; color:#1d4ed8; }
+    .status-shipped   { background:#f0fdf4; color:#15803d; }
+    .status-delivered { background:#f0fdf4; color:#15803d; }
+    .status-cancelled { background:#fef2f2; color:#dc2626; }
+
+    /* Items */
+    .order-items { padding:0 24px; }
+    .order-item {
+      display:flex; align-items:center; gap:14px;
+      padding:16px 0; border-bottom:1px solid #f3f4f6;
+    }
+    .order-item:last-child { border-bottom:none; }
+    .order-item img {
+      width:64px; height:64px; border-radius:var(--radius);
+      object-fit:cover; border:1px solid #f0f0f0; flex-shrink:0;
+    }
+    .order-item-info { flex:1; min-width:0; }
+    .order-item-name { font-size:14px; font-weight:600; color:var(--dark); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:3px; }
+    .order-item-meta { font-size:12px; color:var(--muted); }
+    .order-item-right { text-align:right; flex-shrink:0; }
+    .order-item-qty   { font-size:13px; color:var(--gray); margin-bottom:3px; }
+    .order-item-sub   { font-size:14px; font-weight:700; color:var(--dark2); }
+
+    /* Summary footer */
+    .order-summary {
+      background:#fafafa; padding:16px 24px;
+      border-top:1px solid #f3f4f6;
+      display:grid; grid-template-columns:1fr 1fr; gap:12px 24px;
+    }
+    .sum-item { display:flex; justify-content:space-between; align-items:center; font-size:13px; }
+    .sum-item .lbl { color:var(--gray); font-weight:400; }
+    .sum-item .val { font-weight:600; color:var(--dark2); }
+    .sum-item .val.green { color:var(--green); }
+    .sum-item .val.red   { color:var(--red); }
+    .sum-item .val.brand { color:var(--brand-dark); }
+    .order-total-row {
+      grid-column:1/-1; display:flex; justify-content:space-between; align-items:center;
+      padding-top:12px; border-top:1px solid #e5e7eb; margin-top:4px;
+    }
+    .order-total-row .lbl { font-size:15px; font-weight:700; color:var(--dark); }
+    .order-total-row .val { font-size:18px; font-weight:800; color:var(--red); }
+
+    /* Order actions */
+    .order-actions {
+      padding:14px 24px; border-top:1px solid #f3f4f6;
+      display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;
+    }
+    .btn-reorder {
+      padding:9px 18px; background:var(--brand); color:#fff;
+      border:none; border-radius:var(--radius); font-size:13px; font-weight:700;
+      cursor:pointer; font-family:var(--font); transition:background .2s;
+    }
+    .btn-reorder:hover { background:var(--brand-dark); }
+    .btn-detail {
+      padding:9px 18px; background:var(--light); color:var(--dark2);
+      border:1.5px solid #e5e7eb; border-radius:var(--radius); font-size:13px;
+      font-weight:600; cursor:pointer; font-family:var(--font); text-decoration:none;
+      display:inline-flex; align-items:center; gap:5px;
+    }
+
+    /* Empty */
+    .empty-orders { text-align:center; padding:80px 20px; }
+    .empty-orders .empty-icon { font-size:64px; margin-bottom:16px; }
+    .empty-orders h3 { font-size:20px; font-weight:800; color:var(--dark); margin-bottom:8px; }
+    .empty-orders p  { font-size:14px; color:var(--gray); font-weight:400; margin-bottom:24px; }
+
+    /* Skeleton */
+    .skeleton { background:linear-gradient(90deg,#f0f0f0 25%,#e8e8e8 50%,#f0f0f0 75%); background-size:200% 100%; animation:shimmer 1.4s infinite; border-radius:6px; }
+    @keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+    .skel-card { background:var(--white); border-radius:var(--radius-xl); box-shadow:var(--shadow); padding:20px 24px; margin-bottom:20px; }
+
+    /* Address box */
+    .address-box {
+      background:var(--brand-light); border:1px solid var(--brand-border);
+      border-radius:var(--radius); padding:10px 14px; font-size:13px; color:var(--dark2);
+      grid-column:1/-1;
+    }
+    .address-box strong { display:block; margin-bottom:2px; font-size:13px; }
+    .address-box span   { font-weight:400; color:var(--gray); }
+
+    /* Coupon chip */
+    .coupon-chip {
+      display:inline-flex; align-items:center; gap:5px;
+      background:#f0fdf4; color:#15803d; border:1px solid #bbf7d0;
+      padding:2px 10px; border-radius:99px; font-size:12px; font-weight:700;
+    }
+
+    @media(max-width:768px){
+      .page-hero { padding:32px 20px; }
+      .filter-bar { padding:0 16px; }
+      .orders-wrap { padding:0 16px 40px; }
+      .order-summary { grid-template-columns:1fr; }
+      .order-total-row { grid-column:1; }
+    }
+  </style>
 </head>
 <body>
 
-<h1 class="page-title">🛒 My Purchases</h1>
-
-<!-- Table Header -->
-<div class="order-header-row">
-  <div>Picture</div>
-  <div>Name</div>
-  <div>Qty</div>
-  <div>Total</div>
-</div>
-
-<div id="order-list" class="order-list">
-  <p class="loading">Loading orders...</p>
-</div>
-
-<script>
-/* ================= Firebase ================= */
-const firebaseConfig = {
-  apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
-  authDomain: "mini-ecom-39979.firebaseapp.com",
-  projectId: "mini-ecom-39979"
-};
-firebase.initializeApp(firebaseConfig);
-
-const db = firebase.firestore();
-const auth = firebase.auth();
-
-const orderList = document.getElementById("order-list");
-
-/* ================= Load Orders ================= */
-auth.onAuthStateChanged(async user => {
-  if (!user) {
-    orderList.innerHTML = `<p class="loading">Please login to view your orders.</p>`;
-    return;
-  }
-
-  let snap;
-  try {
-    snap = await db.collection("orders")
-      .where("userId", "==", user.uid)
-      .orderBy("createdAt", "desc")
-      .get();
-  } catch (err) {
-    console.error(err);
-    orderList.innerHTML = `<p class="loading">Error loading orders</p>`;
-    return;
-  }
-
-  if (snap.empty) {
-    orderList.innerHTML = `<p class="loading">No orders found.</p>`;
-    return;
-  }
-
-  orderList.innerHTML = "";
-
-  snap.forEach(doc => {
-    const order = doc.data();
-    const orderCard = document.createElement("div");
-    orderCard.className = "order-card";
-
-    const date = order.createdAt?.toDate().toLocaleString() || "-";
-
-    /* ===== Items ===== */
-    let itemsHTML = "";
-    (order.items || []).forEach(item => {
-      itemsHTML += `
-        <div class="order-row">
-          <div class="col image">
-            <img src="${item.imageUrl || 'images/placeholder.jpg'}">
-          </div>
-          <div class="col name">${item.name}</div>
-          <div class="col qty">${item.quantity}</div>
-          <div class="col total">CNY ${item.price * item.quantity}</div>
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a class="nav-logo" href="../home.html">
+      <img src="../images/logo433.png" alt="CSS Mall" />
+      <span class="nav-logo-text">CSS <span>Mall</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="../home.html">Home</a></li>
+      <li><a href="../shop.html">Shop</a></li>
+      <li><a href="../coupon.html">Coupons</a></li>
+      <li class="nav-dropdown">
+        <span class="nav-dropdown-btn">My Account</span>
+        <div class="nav-dropdown-menu">
+          <a href="../acc.html">My Profile</a>
+          <a href="../myshop.html">My Shop</a>
+          <a href="../wishlist.html">Wishlist</a>
+          <a href="my-purchase.html" class="active">My Orders</a>
+          <a href="#" id="logout-btn" class="danger">Logout</a>
         </div>
-      `;
+      </li>
+    </ul>
+    <div class="nav-icons">
+      <a href="../wishlist.html" class="nav-icon-btn">♡</a>
+      <a href="../cart.html" class="nav-icon-btn">
+        <img src="../images/shopping-cart.png" alt="Cart" />
+        <span class="nav-badge" id="cart-count">0</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="page-hero">
+    <h1>My Purchases</h1>
+    <p>Track all your orders and their status</p>
+  </div>
+
+  <!-- Filter tabs -->
+  <div class="filter-bar">
+    <button class="filter-tab active" data-status="all">All Orders</button>
+    <button class="filter-tab" data-status="pending">Pending</button>
+    <button class="filter-tab" data-status="processing">Processing</button>
+    <button class="filter-tab" data-status="shipped">Shipped</button>
+    <button class="filter-tab" data-status="delivered">Delivered</button>
+    <button class="filter-tab" data-status="cancelled">Cancelled</button>
+  </div>
+
+  <!-- Orders list -->
+  <div class="orders-wrap">
+    <div id="order-list">
+      <!-- Skeleton -->
+      <div class="skel-card"><div class="skeleton" style="height:20px;width:40%;margin-bottom:14px;"></div><div class="skeleton" style="height:64px;margin-bottom:10px;"></div><div class="skeleton" style="height:64px;"></div></div>
+      <div class="skel-card"><div class="skeleton" style="height:20px;width:55%;margin-bottom:14px;"></div><div class="skeleton" style="height:64px;"></div></div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    function showToast(msg, duration = 2500) {
+      const t = document.getElementById("toast");
+      t.textContent = msg; t.style.display = "flex";
+      clearTimeout(t._t); t._t = setTimeout(() => { t.style.display = "none"; }, duration);
+    }
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
+      authDomain: "mini-ecom-39979.firebaseapp.com",
+      projectId: "mini-ecom-39979",
+      storageBucket: "mini-ecom-39979.firebasestorage.app",
+      messagingSenderId: "43435045240",
+      appId: "1:43435045240:web:ba425c522e37b4c1a7d88d"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db   = firebase.firestore();
+
+    let allOrders = [];
+    let currentFilter = "all";
+
+    // ── Filter tabs ──
+    document.querySelectorAll(".filter-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".filter-tab").forEach(t => t.classList.remove("active"));
+        tab.classList.add("active");
+        currentFilter = tab.dataset.status;
+        renderOrders();
+      });
     });
 
-    orderCard.innerHTML = `
-      <div class="order-items">
-        ${itemsHTML}
-      </div>
+    // ── Auth ──
+    auth.onAuthStateChanged(async user => {
+      document.getElementById("logout-btn").onclick = e => {
+        e.preventDefault(); auth.signOut().then(() => window.location.href = "../login.html");
+      };
 
-      <div class="order-meta">
-        <span><strong>Order ID:</strong> ${doc.id}</span>
-        <span><strong>Date:</strong> ${date}</span>
-        <span><strong>Payment:</strong> ${order.payment?.toUpperCase()}</span>
-      </div>
-    `;
+      if (!user) {
+        document.getElementById("order-list").innerHTML = `
+          <div class="empty-orders">
+            <div class="empty-icon">🔐</div>
+            <h3>Sign in to see your orders</h3>
+            <p>Log in to track your purchases and order history.</p>
+            <a href="../login.html" class="btn btn-primary btn-lg">Log In</a>
+          </div>`;
+        return;
+      }
 
-    orderList.appendChild(orderCard);
-  });
-});
-</script>
+      db.collection("carts").doc(user.uid).collection("items").onSnapshot(snap => {
+        let t = 0; snap.forEach(d => t += d.data().quantity || 0);
+        document.getElementById("cart-count").textContent = t;
+      });
 
+      loadOrders(user.uid);
+    });
+
+    function statusClass(status) {
+      const map = { pending:"status-pending", processing:"status-processing", shipped:"status-shipped", delivered:"status-delivered", cancelled:"status-cancelled" };
+      return map[status] || "status-pending";
+    }
+    function statusLabel(status) {
+      const map = { pending:"⏳ Pending", processing:"🔄 Processing", shipped:"🚚 Shipped", delivered:"✅ Delivered", cancelled:"❌ Cancelled" };
+      return map[status] || "⏳ Pending";
+    }
+    function paymentLabel(p) {
+      const map = { cod:"Cash on Delivery 🚚", qr:"QR Code 📱", credit:"Credit Card 💳" };
+      return map[p] || (p ? p.toUpperCase() : "—");
+    }
+    function fmtDate(ts) {
+      if (!ts) return "—";
+      const d = ts.toDate ? ts.toDate() : new Date(ts);
+      return d.toLocaleDateString("en-US",{year:"numeric",month:"short",day:"numeric",hour:"2-digit",minute:"2-digit"});
+    }
+    function shortId(id) { return id.slice(0,8).toUpperCase(); }
+
+    async function loadOrders(uid) {
+      const list = document.getElementById("order-list");
+      try {
+        const snap = await db.collection("orders").where("userId","==",uid).get();
+        allOrders = snap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        // Sort by date desc (client side, no index needed)
+        allOrders.sort((a,b) => {
+          const ta = a.createdAt?.toDate?.() || new Date(0);
+          const tb = b.createdAt?.toDate?.() || new Date(0);
+          return tb - ta;
+        });
+        renderOrders();
+      } catch(err) {
+        list.innerHTML = `<p style="color:var(--red);padding:20px;">Error loading orders: ${err.message}</p>`;
+      }
+    }
+
+    function renderOrders() {
+      const list = document.getElementById("order-list");
+      const filtered = currentFilter === "all"
+        ? allOrders
+        : allOrders.filter(o => (o.status || "pending") === currentFilter);
+
+      if (filtered.length === 0) {
+        list.innerHTML = `
+          <div class="empty-orders">
+            <div class="empty-icon">📭</div>
+            <h3>No ${currentFilter === "all" ? "" : currentFilter + " "}orders yet</h3>
+            <p>${currentFilter === "all" ? "You haven't placed any orders." : "No orders with this status."}</p>
+            <a href="../shop.html" class="btn btn-primary">Start Shopping →</a>
+          </div>`;
+        return;
+      }
+
+      list.innerHTML = "";
+      filtered.forEach(order => {
+        const status  = order.status || "pending";
+        const items   = order.items || [];
+        const subtotal = items.reduce((s,i) => s + (i.price * i.quantity), 0);
+        const shipping = typeof order.shipping === "number" ? order.shipping : 0;
+        const discount = typeof order.discount === "number" ? order.discount : 0;
+        const total    = typeof order.total === "number" ? order.total : (subtotal + shipping - discount);
+
+        // Address
+        const addr = order.address;
+        const addrText = addr
+          ? `${addr.fullName || addr.fullname || ""} · ${addr.phoneno || ""} · ${addr.detail || ""}`
+          : null;
+
+        // Items HTML
+        const itemsHTML = items.map(item => `
+          <div class="order-item">
+            <img src="${item.imageUrl || '../images/placeholder.jpg'}" alt="${item.name}" />
+            <div class="order-item-info">
+              <div class="order-item-name">${item.name}</div>
+              <div class="order-item-meta">$${Number(item.price).toFixed(2)} each</div>
+            </div>
+            <div class="order-item-right">
+              <div class="order-item-qty">× ${item.quantity}</div>
+              <div class="order-item-sub">$${(item.price * item.quantity).toFixed(2)}</div>
+            </div>
+          </div>`).join("");
+
+        const card = document.createElement("div");
+        card.className = "order-card";
+        card.innerHTML = `
+          <div class="order-head">
+            <div class="order-head-left">
+              <span class="order-id">#${shortId(order.id)}</span>
+              <span class="order-date">${fmtDate(order.createdAt)}</span>
+            </div>
+            <span class="status-badge ${statusClass(status)}">${statusLabel(status)}</span>
+          </div>
+
+          <div class="order-items">${itemsHTML}</div>
+
+          <div class="order-summary">
+
+            <div class="sum-item">
+              <span class="lbl">Subtotal</span>
+              <span class="val">$${subtotal.toFixed(2)}</span>
+            </div>
+
+            <div class="sum-item">
+              <span class="lbl">Shipping</span>
+              <span class="val ${shipping === 0 ? "green" : ""}">
+                ${shipping === 0 ? "Free 🎉" : "$" + shipping.toFixed(2)}
+              </span>
+            </div>
+
+            ${discount > 0 ? `
+            <div class="sum-item">
+              <span class="lbl">Discount ${order.coupon ? `<span class="coupon-chip">🎟️ ${order.coupon}</span>` : ""}</span>
+              <span class="val green">-$${discount.toFixed(2)}</span>
+            </div>` : order.coupon ? `
+            <div class="sum-item">
+              <span class="lbl">Coupon</span>
+              <span class="val brand"><span class="coupon-chip">🎟️ ${order.coupon}</span></span>
+            </div>` : ""}
+
+            <div class="sum-item">
+              <span class="lbl">Payment</span>
+              <span class="val">${paymentLabel(order.payment)}</span>
+            </div>
+
+            ${addrText ? `
+            <div class="address-box">
+              <strong>📍 Delivery Address</strong>
+              <span>${addrText}</span>
+            </div>` : ""}
+
+            <div class="order-total-row">
+              <span class="lbl">Order Total</span>
+              <span class="val">$${total.toFixed(2)}</span>
+            </div>
+          </div>
+
+          <div class="order-actions">
+            <a href="../shop.html" class="btn-detail">🛍️ Shop Again</a>
+          </div>`;
+
+        list.appendChild(card);
+      });
+    }
+  </script>
 </body>
 </html>

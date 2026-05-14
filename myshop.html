@@ -1,276 +1,403 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>My Shop</title>
-    <link rel="stylesheet" href="myshop.css"/>
-    <!-- Firebase UMD Build -->
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-storage-compat.js"></script>
-    <!-- Chart.js for graphs -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Shop — CSS Mall</title>
+  <link rel="stylesheet" href="css/global.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { background: var(--light); }
+
+    /* Hero */
+    .shop-hero {
+      background: linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);
+      padding: 40px 48px 36px; color:#fff;
+      display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;
+    }
+    .shop-hero-left h1 { font-size:26px; font-weight:800; margin-bottom:4px; }
+    .shop-hero-left p  { font-size:13px; color:rgba(255,255,255,.55); font-weight:400; }
+    .shop-hero-actions { display:flex; gap:10px; flex-wrap:wrap; }
+    .btn-hero { padding:10px 20px; border-radius:var(--radius); font-size:13px; font-weight:700; cursor:pointer; font-family:var(--font); border:none; text-decoration:none; display:inline-flex; align-items:center; gap:6px; }
+    .btn-hero-primary { background:var(--brand); color:#fff; }
+    .btn-hero-primary:hover { background:var(--brand-dark); }
+    .btn-hero-outline { background:rgba(255,255,255,.1); color:#fff; border:1.5px solid rgba(255,255,255,.3); }
+    .btn-hero-outline:hover { background:rgba(255,255,255,.2); }
+
+    /* Stats row */
+    .stats-row {
+      display:grid; grid-template-columns:repeat(4,1fr);
+      background:var(--white); border-bottom:1px solid #f0f0f0;
+    }
+    .stat-cell {
+      padding:20px 24px; text-align:center; border-right:1px solid #f0f0f0;
+      cursor: pointer; transition: background .15s;
+    }
+    .stat-cell:last-child { border-right:none; }
+    .stat-cell:hover { background: var(--brand-light); }
+    .stat-num { font-size:28px; font-weight:800; color:var(--dark); margin-bottom:4px; }
+    .stat-num.orange { color:var(--brand-dark); }
+    .stat-label { font-size:12px; font-weight:600; color:var(--muted); text-transform:uppercase; letter-spacing:.5px; }
+
+    /* Main layout */
+    .page-body {
+      max-width:1300px; margin:0 auto; padding:28px 24px 60px;
+    }
+
+    /* Section header */
+    .sec-header {
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:20px;
+    }
+    .sec-header h2 { font-size:18px; font-weight:800; color:var(--dark); }
+
+    /* Products grid */
+    .products-grid {
+      display:grid; grid-template-columns:repeat(auto-fill, minmax(220px,1fr));
+      gap:18px;
+    }
+
+    /* Product card */
+    .prod-card {
+      background:var(--white); border-radius:var(--radius-lg);
+      box-shadow:var(--shadow-sm); overflow:hidden;
+      transition:box-shadow .2s, transform .2s;
+      display:flex; flex-direction:column;
+    }
+    .prod-card:hover { box-shadow:var(--shadow); transform:translateY(-2px); }
+    .prod-card-img {
+      position:relative; aspect-ratio:1; overflow:hidden; background:#f3f4f6;
+    }
+    .prod-card-img img {
+      width:100%; height:100%; object-fit:cover;
+      transition:transform .3s;
+    }
+    .prod-card:hover .prod-card-img img { transform:scale(1.05); }
+    .stock-badge {
+      position:absolute; top:8px; left:8px;
+      font-size:11px; font-weight:700; padding:3px 10px; border-radius:99px; color:#fff;
+    }
+    .prod-card-body { padding:14px 16px 16px; flex:1; display:flex; flex-direction:column; }
+    .prod-card-name {
+      font-size:14px; font-weight:700; color:var(--dark);
+      white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+      margin-bottom:4px;
+    }
+    .prod-card-price { font-size:16px; font-weight:800; color:var(--red); margin-bottom:14px; }
+    .prod-card-actions { display:flex; gap:8px; margin-top:auto; }
+    .btn-edit {
+      flex:1; padding:8px 0; border:1.5px solid var(--brand);
+      background:transparent; color:var(--brand-dark);
+      border-radius:var(--radius-sm); font-size:13px; font-weight:700;
+      cursor:pointer; font-family:var(--font); text-align:center;
+      text-decoration:none; display:flex; align-items:center; justify-content:center;
+      gap:4px; transition:all .2s;
+    }
+    .btn-edit:hover { background:var(--brand); color:#fff; }
+    .btn-delete {
+      flex:1; padding:8px 0; border:1.5px solid var(--red);
+      background:transparent; color:var(--red);
+      border-radius:var(--radius-sm); font-size:13px; font-weight:700;
+      cursor:pointer; font-family:var(--font); display:flex; align-items:center;
+      justify-content:center; gap:4px; transition:all .2s;
+    }
+    .btn-delete:hover { background:var(--red); color:#fff; }
+    .btn-delete:disabled { opacity:.5; cursor:not-allowed; }
+
+    /* Empty state */
+    .empty-products {
+      grid-column:1/-1; text-align:center; padding:70px 20px;
+    }
+    .empty-products .empty-icon { font-size:64px; margin-bottom:16px; }
+    .empty-products h3 { font-size:20px; font-weight:800; color:var(--dark); margin-bottom:8px; }
+    .empty-products p  { font-size:14px; color:var(--gray); font-weight:400; margin-bottom:24px; }
+
+    /* Delete confirm modal */
+    .confirm-overlay {
+      display:none; position:fixed; inset:0;
+      background:rgba(0,0,0,.5); z-index:900;
+      align-items:center; justify-content:center;
+    }
+    .confirm-overlay.open { display:flex; }
+    .confirm-box {
+      background:var(--white); border-radius:var(--radius-xl);
+      padding:32px; max-width:400px; width:90%;
+      box-shadow:var(--shadow-lg); text-align:center;
+    }
+    .confirm-box .confirm-icon { font-size:48px; margin-bottom:16px; }
+    .confirm-box h3 { font-size:18px; font-weight:800; color:var(--dark); margin-bottom:8px; }
+    .confirm-box p  { font-size:14px; color:var(--gray); font-weight:400; margin-bottom:24px; }
+    .confirm-actions { display:flex; gap:10px; }
+    .btn-confirm-delete {
+      flex:1; padding:12px; background:var(--red); color:#fff;
+      border:none; border-radius:var(--radius); font-size:14px; font-weight:700;
+      cursor:pointer; font-family:var(--font); transition:background .2s;
+    }
+    .btn-confirm-delete:hover { background:#dc2626; }
+    .btn-confirm-cancel {
+      flex:1; padding:12px; background:var(--light); color:var(--dark2);
+      border:1.5px solid #e5e7eb; border-radius:var(--radius); font-size:14px; font-weight:600;
+      cursor:pointer; font-family:var(--font);
+    }
+
+    @media(max-width:900px){
+      .shop-hero { padding:32px 20px; }
+      .stats-row { grid-template-columns:repeat(2,1fr); }
+      .page-body { padding:20px 16px 40px; }
+    }
+    @media(max-width:480px){
+      .stats-row { grid-template-columns:repeat(2,1fr); }
+      .products-grid { grid-template-columns:repeat(2,1fr); }
+    }
+  </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-        <div class="logo">
-        <img src="images/logo433.png" alt="DES403 Logo" class="logo-img" />
-        <span class="logo-text">CSS MALL</span>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a class="nav-logo" href="home.html">
+      <img src="images/logo433.png" alt="CSS Mall" />
+      <span class="nav-logo-text">CSS <span>Mall</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="home.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="coupon.html">Coupons</a></li>
+      <li class="nav-dropdown">
+        <span class="nav-dropdown-btn">My Account</span>
+        <div class="nav-dropdown-menu">
+          <a href="acc.html">My Profile</a>
+          <a href="myshop.html" class="active">My Shop</a>
+          <a href="wishlist.html">Wishlist</a>
+          <a href="#" id="logout-btn" class="danger">Logout</a>
         </div>
-        <ul class="nav-links">
-        <li><a href="home.html">Home</a></li>
-        <li><a href="shop.html">Shop</a></li>
-        <li><a href="coupon.html">Coupon</a></li>
-        <li class="dropdown">
-            <a href="#" class="dropbtn">My Account</a>
-            <div class="dropdown-content">
-            <a href="acc.html">My Profile</a>
-            <a href="myshop.html" class="active">My Shop</a>
-            <a href="#" id="logout-btn">Logout</a>
-            </div>
-        </li>
-        <li>
-            <a href="cart.html">
-            <img src="images/shopping-cart.png" alt="Cart" class="cart-icon" />
-            </a>
-        </li>
-        </ul>
-    </nav>
+      </li>
+    </ul>
+    <div class="nav-icons">
+      <a href="wishlist.html" class="nav-icon-btn">♡</a>
+      <a href="cart.html" class="nav-icon-btn">
+        <img src="images/shopping-cart.png" alt="Cart" />
+        <span class="nav-badge" id="cart-count">0</span>
+      </a>
+    </div>
+  </nav>
 
-    <!-- Main Content -->
-    <main class="main-container">
-        <!-- Shop Header -->
-        <section class="shop-header">
-            <h2 id="shop-name">My Shop</h2>
-            <a href="viewshop.html" class="view-shop-btn">View Shop</a>
-        </section>
-        <hr />
+  <!-- Shop hero -->
+  <div class="shop-hero">
+    <div class="shop-hero-left">
+      <h1 id="shop-name">My Shop</h1>
+      <p>Manage your products and track your sales</p>
+    </div>
+    <div class="shop-hero-actions">
+      <a href="add-product.html" class="btn-hero btn-hero-primary">＋ Add Product</a>
+      <a href="viewshop.html" class="btn-hero btn-hero-outline">View Public Shop →</a>
+    </div>
+  </div>
 
-        <!-- Order Status Section -->
-        <section class="order-status-section">
-            <div class="order-status-header">
-                <h3>Order Status</h3>
-                <a href="#" id="view-sales-history" class="view-history-link">View Sales History &gt;</a>
-            </div>
-            <div class="status-boxes">
-                <div class="status-box">
-                    <div class="status-label">To Ship</div>
-                    <div id="to-ship-count" class="status-count">0</div>
-                </div>
-                <div class="status-box">
-                    <div class="status-label">Cancelled</div>
-                    <div id="cancelled-count" class="status-count">0</div>
-                </div>
-                <div class="status-box">
-                    <div class="status-label">Return</div>
-                    <div id="return-count" class="status-count">0</div>
-                </div>
-                <div class="status-box">
-                    <div class="status-label">Review</div>
-                    <div id="review-count" class="status-count">0</div>
-                </div>
-            </div>
-        </section>
+  <!-- Stats row -->
+  <div class="stats-row">
+    <div class="stat-cell">
+      <div class="stat-num orange" id="product-count">—</div>
+      <div class="stat-label">My Products</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num" id="to-ship-count">0</div>
+      <div class="stat-label">To Ship</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num" id="cancelled-count">0</div>
+      <div class="stat-label">Cancelled</div>
+    </div>
+    <div class="stat-cell">
+      <div class="stat-num" id="review-count">0</div>
+      <div class="stat-label">Pending Review</div>
+    </div>
+  </div>
 
-        <hr class="section-divider" />
+  <!-- Page body -->
+  <div class="page-body">
+    <div class="sec-header">
+      <h2>My Products</h2>
+      <a href="add-product.html" class="btn btn-primary btn-sm">＋ Add Product</a>
+    </div>
+    <div class="products-grid" id="product-grid">
+      <!-- loaded by JS -->
+    </div>
+  </div>
 
-        <!-- My Products Section -->
-        <section id="product-performance-toggle">
-            <div class="performance-header">
-                <a href="add-product.html">
-                    <button id="my-products-btn">My Products</button>
-                </a>
-                <button id="shop-performance-btn">Shop Performance</button>
-            </div>
-        </section>
-          
-        <!-- My Products Section (Redirect Button) -->
-        <section id="my-products" style="display: none">
-            <ul id="product-list"></ul>
-        </section>
-          
-        <!-- Shop Performance Popup Modal -->
-        <div id="performance-popup" class="modal" style="display:none;">
-            <div class="modal-content">
-                <span class="close-btn" id="close-performance">&times;</span>
-                <h3>&larr;    Shop Performance</h3>
-            
-                <div class="performance-tabs">
-                    <button class="active">Sales</button>
-                    <button>Products</button>
-                </div>
-                <hr class="section-divider" />
-          
-                <div class="period-options">
-                    <div class="order-period">
-                        <span>Order Period:</span>
-                        <span style="font-weight: 100; font-size: 14px;">Last updated at <span id="last-updated">--:--</span></span>
-                    </div>
-                    <div class="d-flex justify-space-between flex-wrap gap-2 my-3 period-button-group">
-                        <button class="period-button active" onclick="loadPerformance('realtime', this)">Real-Time</button>
-                        <button class="period-button" onclick="loadPerformance('yesterday', this)">Yesterday</button>
-                        <button class="period-button" onclick="loadPerformance('7days', this)">Past 7 Days</button>
-                        <button class="period-button" onclick="loadPerformance('30days', this)">Past 30 Days</button>
-                        <button class="period-button" onclick="loadPerformance('week', this)">This Week</button>
-                        <button class="period-button" onclick="loadPerformance('month', this)">This Month</button>
-                    </div>      
-                </div>
-                <hr class="section-divider" />
-          
-                <div class="key-metrics">
-                    <div class="metrics-header">
-                        <span>Key Metrics</span>
-                        <select>
-                            <option>Confirmed Order</option>
-                        </select>
-                    </div>
-                    <div id="key-metrics" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin: 20px 0;">
-                        <div><strong>Sales</strong><br><span id="sales">CNY 0</span><br><small id="sales-percent">0%</small></div>
-                        <div><strong>Orders</strong><br><span id="orders">0</span><br><small id="orders-percent">0%</small></div>
-                        <div><strong>Sales per Order</strong><br><span id="sales-per-order">CNY 0</span><br><small>0%</small></div>
-                        <div><strong>Buyers</strong><br><span id="buyers">0</span><br><small>0%</small></div>
-                        <div><strong>Sales per Buyer</strong><br><span id="sales-per-buyer">CNY 0</span><br><small>0%</small></div>
-                        <div><strong>Conversion Rate</strong><br><span id="conversion-rate">0%</span></div>
-                    </div>      
-                </div>
-                <canvas id="sales-chart" style="margin-top: 20px;"></canvas>
-            </div>
-        </div>
-    </main>
+  <!-- Delete confirm modal -->
+  <div class="confirm-overlay" id="delete-confirm">
+    <div class="confirm-box">
+      <div class="confirm-icon">🗑️</div>
+      <h3>Delete Product?</h3>
+      <p id="confirm-product-name">This product will be permanently removed from the marketplace.</p>
+      <div class="confirm-actions">
+        <button class="btn-confirm-delete" id="confirm-delete-btn">Yes, Delete</button>
+        <button class="btn-confirm-cancel" id="cancel-delete-btn">Cancel</button>
+      </div>
+    </div>
+  </div>
 
-    <script>
-  // ✅ Firebase NEW project (mini-ecom-39979)
-  const firebaseConfig = {
-    apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
-    authDomain: "mini-ecom-39979.firebaseapp.com",
-    projectId: "mini-ecom-39979",
-    storageBucket: "mini-ecom-39979.firebasestorage.app",
-    messagingSenderId: "43435045240",
-    appId: "1:43435045240:web:ba425c522e37b4c1a7d88d"
-  };
+  <div class="toast" id="toast"></div>
 
-  // Initialize Firebase
-  firebase.initializeApp(firebaseConfig);
+  <script>
+    function showToast(msg, duration = 2500) {
+      const t = document.getElementById("toast");
+      t.textContent = msg; t.style.display = "flex";
+      clearTimeout(t._t); t._t = setTimeout(() => { t.style.display = "none"; }, duration);
+    }
 
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-  const storageRef = firebase.storage().ref();
+    const firebaseConfig = {
+      apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
+      authDomain: "mini-ecom-39979.firebaseapp.com",
+      projectId: "mini-ecom-39979",
+      storageBucket: "mini-ecom-39979.firebasestorage.app",
+      messagingSenderId: "43435045240",
+      appId: "1:43435045240:web:ba425c522e37b4c1a7d88d"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db   = firebase.firestore();
 
-  let currentUser = null;
-  let salesChart = null;
+    let currentUser = null;
 
-  // ================= AUTH =================
-  auth.onAuthStateChanged(async (user) => {
-    if (user) {
+    // ── Delete modal state ──
+    let pendingDeleteId   = null;
+    let pendingDeleteCard = null;
+
+    document.getElementById("cancel-delete-btn").onclick = () => {
+      document.getElementById("delete-confirm").classList.remove("open");
+      pendingDeleteId = null; pendingDeleteCard = null;
+    };
+
+    document.getElementById("confirm-delete-btn").onclick = async () => {
+      if (!pendingDeleteId) return;
+      const btn = document.getElementById("confirm-delete-btn");
+      btn.textContent = "Deleting…"; btn.disabled = true;
+
+      try {
+        await db.collection("products").doc(pendingDeleteId).delete();
+        document.getElementById("delete-confirm").classList.remove("open");
+        if (pendingDeleteCard) {
+          pendingDeleteCard.style.transition = "opacity .3s, transform .3s";
+          pendingDeleteCard.style.opacity = "0";
+          pendingDeleteCard.style.transform = "scale(.95)";
+          setTimeout(() => pendingDeleteCard.remove(), 300);
+        }
+        showToast("Product deleted successfully.");
+      } catch(e) {
+        showToast("Error: " + e.message);
+      } finally {
+        btn.textContent = "Yes, Delete"; btn.disabled = false;
+        pendingDeleteId = null; pendingDeleteCard = null;
+      }
+    };
+
+    function openDeleteConfirm(productId, productName, cardEl) {
+      pendingDeleteId   = productId;
+      pendingDeleteCard = cardEl;
+      document.getElementById("confirm-product-name").textContent =
+        `"${productName}" will be permanently removed from the marketplace.`;
+      document.getElementById("delete-confirm").classList.add("open");
+    }
+
+    // ── Auth ──
+    auth.onAuthStateChanged(async user => {
+      if (!user) { window.location.href = "login.html"; return; }
       currentUser = user;
 
-      const userDoc = await db.collection("users").doc(user.uid).get();
-      const userData = userDoc.data();
+      document.getElementById("logout-btn").onclick = e => {
+        e.preventDefault(); auth.signOut().then(() => window.location.href = "login.html");
+      };
 
-      const shopName = userData?.username || "My Shop";
-      document.getElementById("shop-name").textContent = shopName;
+      // cart count
+      db.collection("carts").doc(user.uid).collection("items").onSnapshot(snap => {
+        let t = 0; snap.forEach(d => t += d.data().quantity || 0);
+        document.getElementById("cart-count").textContent = t;
+      });
+
+      // shop name
+      const userDoc = await db.collection("users").doc(user.uid).get();
+      document.getElementById("shop-name").textContent =
+        userDoc.data()?.username || "My Shop";
 
       loadOrderStatuses(user.uid);
-      loadUserProducts(user.uid);
-    } else {
-      window.location.href = "login.html";
-    }
-  });
-
-  // ================= ORDER STATUS =================
-  async function loadOrderStatuses(userId) {
-    const snapshot = await db
-      .collection("orders")
-      .where("sellerId", "==", userId)
-      .get();
-
-    let toShip = 0, cancelled = 0, returned = 0, review = 0;
-
-    snapshot.forEach(doc => {
-      const status = doc.data().status;
-      if (status === "to ship") toShip++;
-      else if (status === "cancelled") cancelled++;
-      else if (status === "return") returned++;
-      else if (status === "review") review++;
+      loadProducts(user.uid);
     });
 
-    document.getElementById("to-ship-count").textContent = toShip;
-    document.getElementById("cancelled-count").textContent = cancelled;
-    document.getElementById("return-count").textContent = returned;
-    document.getElementById("review-count").textContent = review;
-  }
-
-  // ================= PRODUCTS =================
-  async function loadUserProducts(userId) {
-    const productList = document.getElementById("product-list");
-    productList.innerHTML = "";
-
-    const snapshot = await db
-      .collection("products")
-      .where("userId", "==", userId)
-      .get();
-
-    if (snapshot.empty) {
-      productList.innerHTML = "<li>No products found.</li>";
-      return;
+    // ── Order status ──
+    async function loadOrderStatuses(uid) {
+      try {
+        const snap = await db.collection("orders").where("userId","==",uid).get();
+        let toShip = 0, cancelled = 0, review = 0;
+        snap.forEach(doc => {
+          const s = doc.data().status;
+          if (s === "to ship") toShip++;
+          else if (s === "cancelled") cancelled++;
+          else if (s === "review") review++;
+        });
+        document.getElementById("to-ship-count").textContent   = toShip;
+        document.getElementById("cancelled-count").textContent = cancelled;
+        document.getElementById("review-count").textContent    = review;
+      } catch(_) {}
     }
 
-    snapshot.forEach(doc => {
-      const product = doc.data();
-      const li = document.createElement("li");
-      li.textContent = `${product.name} - ฿${product.price}`;
-      productList.appendChild(li);
-    });
-  }
+    // ── Load products ──
+    function loadProducts(uid) {
+      const grid = document.getElementById("product-grid");
 
-  // ================= PERFORMANCE (DUMMY) =================
-  function loadPerformance(period, button) {
-    document.querySelectorAll('.period-button')
-      .forEach(btn => btn.classList.remove('active'));
-    button.classList.add('active');
+      db.collection("products").where("sellerId","==",uid)
+        .onSnapshot(snapshot => {
+          grid.innerHTML = "";
+          document.getElementById("product-count").textContent = snapshot.size;
 
-    document.getElementById('sales').textContent = "¥" + Math.floor(Math.random() * 10000);
-    document.getElementById('orders').textContent = Math.floor(Math.random() * 500);
-    document.getElementById('buyers').textContent = Math.floor(Math.random() * 300);
-    document.getElementById('sales-per-order').textContent = "¥" + Math.floor(Math.random() * 200);
-    document.getElementById('sales-per-buyer').textContent = "¥" + Math.floor(Math.random() * 500);
-    document.getElementById('conversion-rate').textContent = Math.floor(Math.random() * 100) + "%";
-    document.getElementById('last-updated').textContent = new Date().toLocaleTimeString();
+          if (snapshot.empty) {
+            grid.innerHTML = `
+              <div class="empty-products">
+                <div class="empty-icon">📦</div>
+                <h3>No products yet</h3>
+                <p>Start selling by adding your first product to the marketplace.</p>
+                <a href="add-product.html" class="btn btn-primary btn-lg">＋ Add Your First Product</a>
+              </div>`;
+            return;
+          }
 
-    const ctx = document.getElementById('sales-chart').getContext('2d');
-    if (salesChart) salesChart.destroy();
+          snapshot.forEach(doc => {
+            const p = { id: doc.id, ...doc.data() };
+            const card = document.createElement("div");
+            card.className = "prod-card";
 
-    salesChart = new Chart(ctx, {
-      type: 'bar',
-      data: {
-        labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
-        datasets: [{
-          label: 'Sales',
-          data: Array(7).fill(0).map(() => Math.floor(Math.random() * 1000))
-        }]
-      },
-      options: {
-        scales: { y: { beginAtZero: true } }
-      }
-    });
-  }
+            const stockColor = (p.stock > 0) ? "var(--green)" : "var(--red)";
+            const stockText  = (typeof p.stock === "number")
+              ? (p.stock > 0 ? `${p.stock} in stock` : "Out of stock")
+              : "In Stock";
 
-  document.getElementById("shop-performance-btn").onclick = () => {
-    document.getElementById("performance-popup").style.display = "block";
-    loadPerformance('realtime', document.querySelector('.period-button'));
-  };
+            card.innerHTML = `
+              <div class="prod-card-img">
+                <img src="${p.imageUrl || 'images/placeholder.jpg'}" alt="${p.name}" loading="lazy" />
+                <span class="stock-badge" style="background:${stockColor};">${stockText}</span>
+              </div>
+              <div class="prod-card-body">
+                <div class="prod-card-name" title="${p.name}">${p.name}</div>
+                <div class="prod-card-price">$${Number(p.price).toFixed(2)}</div>
+                <div class="prod-card-actions">
+                  <a class="btn-edit" href="edit-product.html?id=${p.id}">✏️ Edit</a>
+                  <button class="btn-delete">🗑️ Delete</button>
+                </div>
+              </div>`;
 
-  document.getElementById("close-performance").onclick = () => {
-    document.getElementById("performance-popup").style.display = "none";
-  };
+            card.querySelector(".btn-delete").onclick = () =>
+              openDeleteConfirm(p.id, p.name, card);
 
-  document.getElementById("logout-btn").onclick = () => {
-    auth.signOut().then(() => window.location.href = "login.html");
-  };
-</script>
+            grid.appendChild(card);
+          });
+        }, err => {
+          grid.innerHTML = `<p style="color:var(--red);padding:20px;">Error loading products: ${err.message}</p>`;
+        });
+    }
+  </script>
 </body>
 </html>

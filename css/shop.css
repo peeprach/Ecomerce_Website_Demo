@@ -1,0 +1,159 @@
+/* ── Shop Page ───────────────────────────────────────────── */
+
+/* Hero */
+.shop-hero {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  padding: 48px 48px 40px;
+  color: #fff;
+  position: relative;
+  overflow: hidden;
+}
+.shop-hero::after {
+  content:'';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 320px; height: 320px;
+  background: var(--brand);
+  border-radius: 50%;
+  opacity: .07;
+}
+.shop-hero h1 { font-size: 32px; font-weight: 800; margin-bottom: 6px; }
+.shop-hero p   { font-size: 14px; color: rgba(255,255,255,.6); font-weight: 400; }
+.shop-search-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+  max-width: 640px;
+}
+.shop-search-row input {
+  flex: 1;
+  padding: 13px 18px;
+  border-radius: var(--radius-lg);
+  border: none;
+  font-size: 14px;
+  font-family: var(--font);
+  background: rgba(255,255,255,.12);
+  color: #fff;
+  outline: none;
+  transition: background .2s;
+}
+.shop-search-row input::placeholder { color: rgba(255,255,255,.5); }
+.shop-search-row input:focus { background: rgba(255,255,255,.2); }
+.shop-search-row button {
+  padding: 13px 22px;
+  background: var(--brand);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-lg);
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background .2s;
+}
+.shop-search-row button:hover { background: var(--brand-dark); }
+
+/* Toolbar */
+.shop-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 48px;
+  background: var(--white);
+  border-bottom: 1px solid #f0f0f0;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.filter-tabs { display: flex; gap: 6px; }
+.filter-tab {
+  padding: 7px 16px;
+  border: 1.5px solid #e5e7eb;
+  background: var(--white);
+  border-radius: 99px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dark2);
+  cursor: pointer;
+  transition: all .2s;
+  font-family: var(--font);
+}
+.filter-tab:hover { border-color: var(--brand); color: var(--brand-dark); }
+.filter-tab.active {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: var(--white);
+}
+.toolbar-right { display: flex; align-items: center; gap: 14px; }
+#result-count { font-size: 13px; color: var(--gray); font-weight: 500; }
+.sort-select {
+  padding: 8px 14px;
+  border: 1.5px solid #e5e7eb;
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--dark2);
+  background: var(--white);
+  cursor: pointer;
+  outline: none;
+}
+.sort-select:focus { border-color: var(--brand); }
+
+/* Grid */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 18px;
+  padding: 28px 48px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px 0 40px;
+}
+.pagination button {
+  padding: 9px 16px;
+  border: 1.5px solid #e5e7eb;
+  background: var(--white);
+  border-radius: var(--radius);
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--dark2);
+  cursor: pointer;
+  transition: all .2s;
+}
+.pagination button:hover { border-color: var(--brand); color: var(--brand-dark); }
+.pagination button.active {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Footer strip */
+.shop-footer-strip {
+  background: var(--dark);
+  color: #9ca3af;
+  text-align: center;
+  padding: 20px;
+  font-size: 13px;
+}
+
+/* Empty state */
+.empty-state {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--muted);
+}
+.empty-state .empty-icon { font-size: 56px; margin-bottom: 16px; }
+.empty-state h3 { font-size: 18px; color: var(--dark2); margin-bottom: 8px; }
+.empty-state p  { font-size: 14px; font-weight: 400; }
+
+/* Responsive */
+@media (max-width: 1200px) { .product-grid { grid-template-columns: repeat(4,1fr); } }
+@media (max-width: 960px)  { .product-grid { grid-template-columns: repeat(3,1fr); padding: 20px 24px; } .shop-toolbar { padding: 14px 24px; } .shop-hero { padding: 36px 24px; } }
+@media (max-width: 640px)  { .product-grid { grid-template-columns: repeat(2,1fr); gap:12px; padding:16px; } .filter-tabs { overflow-x:auto; } .shop-hero h1 { font-size:24px; } }

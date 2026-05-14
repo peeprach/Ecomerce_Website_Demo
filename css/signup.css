@@ -24,7 +24,7 @@ body {
 .logo {
     display: flex;
     align-items: center;
-    gap: 20px; /* ปรับระยะห่าง */
+    gap: 20px; 
   }
   
   .logo img {
@@ -39,15 +39,15 @@ body {
     display: flex;
     align-items: center;
     position: relative;
-    padding-left: 20px; /* เพิ่มช่องว่างระหว่างเส้นกับข้อความ */
+    padding-left: 20px; 
   }
   
   .logo-text::before {
     content: "";
     display: inline-block;
-    width: 2px; /* ความกว้างของเส้น */
-    height: 30px; /* ความยาวของเส้น */
-    background-color: #aaa; /* สีของเส้น */
+    width: 2px; 
+    height: 30px; 
+    background-color: #aaa; 
     position: absolute;
     left: 0;
     top: 50%;
@@ -80,7 +80,7 @@ body {
     align-items: center;
     justify-content: center;
     height: 90vh;
-    background: url('images/welcome_bg.png') no-repeat center center/cover;
+    background: url('../images/welcome_bg.png') no-repeat center center/cover;
     color: #333;
     text-align: center;
     padding: 20px;
@@ -124,19 +124,19 @@ body {
     background-color: #b38754;
 }
 
-/* ตั้งค่า Layout */
+
 .signup-container {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 80vh;
     background: linear-gradient(rgba(255, 255, 255, 0.6), rgba(255, 255, 255, 0.6)), 
-                url('images/welcome_bg.png') no-repeat center center/cover;
+                url('../images/welcome_bg.png') no-repeat center center/cover;
     padding: 20px;
 }
 
 
-/* ส่วนซ้าย (Logo) */
+
 .left-side {
     flex: 1;
     display: flex;
@@ -153,7 +153,7 @@ body {
     width: 200px;
     margin-bottom: 10px;
 }
-/* ส่วนขวา (Login Form) */
+
 .signup-form {
     flex: 1;
     max-width: 400px;
@@ -194,13 +194,13 @@ body {
 }
 
 .signup-form p a {
-    color: #ff9b0e; /* กำหนดให้ "Sign Up" เป็นสีเหลือง */
-    text-decoration: none; /* เอาเส้นใต้ของลิงก์ออก */
-    font-weight: bold; /* ทำให้ตัวหนาขึ้น (ถ้าต้องการ) */
+    color: #ff9b0e; 
+    text-decoration: none; 
+    font-weight: bold; 
 }
 
 .signup-form p a:hover {
-    color: #1c1e20; /* เปลี่ยนเป็นสีทองเมื่อโฮเวอร์ */
+    color: #1c1e20; 
 }
 
 .btn-signup {
@@ -218,7 +218,7 @@ body {
     background-color: #e08800;
 }
 
-/* ปรับให้แสดงเป็นคอลัมน์เดียวในมือถือ */
+
 @media (max-width: 768px) {
     .login-container {
         flex-direction: column;

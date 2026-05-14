@@ -18,7 +18,7 @@ body, html {
   }
     
     .cart-icon {
-      width: 24px; /* ปรับขนาดไอคอนตามต้องการ */
+      width: 24px;
       height: auto;
       vertical-align: middle;
       margin-top: -5px;
@@ -27,7 +27,7 @@ body, html {
     .logo {
       display: flex;
       align-items: center;
-      gap: 20px; /* ปรับระยะห่าง */
+      gap: 20px;
     }
     
     .logo img {
@@ -42,15 +42,15 @@ body, html {
       display: flex;
       align-items: center;
       position: relative;
-      padding-left: 20px; /* เพิ่มช่องว่างระหว่างเส้นกับข้อความ */
+      padding-left: 20px;
     }
     
     .logo-text::before {
       content: "";
       display: inline-block;
-      width: 2px; /* ความกว้างของเส้น */
-      height: 30px; /* ความยาวของเส้น */
-      background-color: #aaa; /* สีของเส้น */
+      width: 2px;
+      height: 30px;
+      background-color: #aaa;
       position: absolute;
       left: 0;
       top: 50%;
@@ -132,14 +132,14 @@ body, html {
   .menu ul li a {
     display: flex;
     align-items: center;
-    gap: 12px; /* ระยะห่างระหว่างไอคอนกับข้อความ */
+    gap: 12px;
     padding: 8px;
     font-size: 14px;
     text-decoration: none;
     color: black;
   }
   .menu ul li a .icon {
-    width: 24px;  /* ปรับขนาดไอคอน */
+    width: 24px;
     height: 24px;
   }
   
@@ -148,11 +148,11 @@ body, html {
     padding-left: 20px;
   }
   .submenu.show {
-    display: block; /* แสดงเมนูเมื่อมี class 'show' */
+    display: block;
   }
   
   .menu ul li:hover .submenu {
-    display: block; /* แสดงเมนูย่อยเมื่อ hover */
+    display: block;
   }
   
   .submenu li {
@@ -188,9 +188,9 @@ body, html {
   .profile-subtitle {
     margin-top: -15px;
     padding-bottom: 20px;
-    border-bottom: 1px solid #ccc; /* สีเทาอ่อน */
-    display: inline-block; /* ปรับให้เส้นมีความยาวตามข้อความ */
-    width: 100%; /* หรือกำหนดเป็นความกว้างที่ต้องการ */
+    border-bottom: 1px solid #ccc;
+    display: inline-block;
+    width: 100%;
   }
 
   /* Active link style */
@@ -201,14 +201,14 @@ body, html {
 #card-content {
   display: flex;
   flex-direction: column;
-  align-items: center; /* จัดกึ่งกลางแนวนอน */
-  justify-content: center; /* จัดกึ่งกลางแนวตั้ง */
-  text-align: center; /* จัดข้อความให้อยู่ตรงกลาง */
-  min-height: 200px; /* ป้องกันการบีบตัวเมื่อไม่มีข้อมูล */
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  min-height: 200px;
 }
 
 #add-new-card {
-  margin-top: 10px; /* เพิ่มระยะห่างจากข้อความ */
+  margin-top: 10px;
   padding: 10px 20px;
   font-size: 16px;
   background-color: #007bff;
@@ -308,7 +308,7 @@ body, html {
 }
 
 .dropdown-content a:hover {
-  background-color: #f9f9f9; /* หรือไม่ต้องใส่ก็ได้ */
+  background-color: #f9f9f9;
   color: #ffc107;
 }
 

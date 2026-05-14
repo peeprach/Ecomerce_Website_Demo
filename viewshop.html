@@ -2,155 +2,334 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>View My Shop</title>
-  <link rel="stylesheet" href="viewshop.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shop — CSS Mall</title>
+  <link rel="stylesheet" href="css/global.css" />
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+  <style>
+    body { background: var(--light); }
+
+    /* Seller hero */
+    .seller-hero {
+      background: linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);
+      padding: 48px 48px 40px;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      flex-wrap: wrap;
+    }
+    .seller-avatar {
+      width: 80px; height: 80px;
+      border-radius: 50%;
+      background: var(--brand);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 34px; font-weight: 800; color: #fff;
+      flex-shrink: 0;
+      border: 3px solid rgba(255,255,255,.2);
+    }
+    .seller-info { flex: 1; }
+    .seller-info h1 { font-size: 26px; font-weight: 800; margin-bottom: 6px; }
+    .seller-info p  { font-size: 14px; color: rgba(255,255,255,.6); font-weight: 400; }
+    .seller-meta {
+      display: flex; gap: 20px; margin-top: 10px; flex-wrap: wrap;
+    }
+    .seller-meta span {
+      font-size: 13px; color: rgba(255,255,255,.7);
+      display: flex; align-items: center; gap: 5px;
+    }
+    .seller-meta strong { color: #fff; }
+    .seller-actions { display: flex; gap: 10px; flex-shrink: 0; }
+    .btn-manage {
+      padding: 10px 20px; border-radius: var(--radius); font-size: 13px;
+      font-weight: 700; cursor: pointer; font-family: var(--font);
+      text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+      border: 1.5px solid rgba(255,255,255,.3);
+      background: rgba(255,255,255,.1); color: #fff;
+      transition: background .2s;
+    }
+    .btn-manage:hover { background: rgba(255,255,255,.2); }
+
+    /* Toolbar */
+    .view-toolbar {
+      background: var(--white);
+      border-bottom: 1px solid #f0f0f0;
+      padding: 14px 48px;
+      display: flex; align-items: center;
+      justify-content: space-between; flex-wrap: wrap; gap: 12px;
+    }
+    #result-label { font-size: 14px; color: var(--gray); font-weight: 500; }
+    .sort-select {
+      padding: 8px 14px; border: 1.5px solid #e5e7eb;
+      border-radius: var(--radius); font-size: 13px;
+      font-family: var(--font); color: var(--dark2); background: var(--white);
+      cursor: pointer; outline: none;
+    }
+    .sort-select:focus { border-color: var(--brand); }
+
+    /* Grid */
+    .products-wrap {
+      max-width: 1400px; margin: 0 auto;
+      padding: 28px 48px 60px;
+    }
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 18px;
+    }
+
+    /* Empty */
+    .shop-empty {
+      grid-column: 1/-1; text-align: center; padding: 80px 20px;
+    }
+    .shop-empty .empty-icon { font-size: 64px; margin-bottom: 16px; }
+    .shop-empty h3 { font-size: 20px; font-weight: 800; color: var(--dark); margin-bottom: 8px; }
+    .shop-empty p  { font-size: 14px; color: var(--gray); font-weight: 400; }
+
+    /* Footer */
+    .page-footer { background: var(--dark); color: #9ca3af; text-align: center; padding: 20px; font-size: 13px; }
+
+    /* Responsive */
+    @media (max-width: 1200px) { .products-grid { grid-template-columns: repeat(4,1fr); } }
+    @media (max-width: 960px)  { .products-grid { grid-template-columns: repeat(3,1fr); } .products-wrap { padding: 20px 24px 40px; } .view-toolbar { padding: 12px 24px; } .seller-hero { padding: 36px 24px; } }
+    @media (max-width: 640px)  { .products-grid { grid-template-columns: repeat(2,1fr); gap:12px; } .products-wrap { padding: 16px; } }
+  </style>
 </head>
 <body>
-  <!-- Navigation -->
+
+  <!-- Navbar -->
   <nav class="navbar">
-    <div class="logo">
-      <img src="images/logo433.png" alt="DES403 Logo" class="logo-img">
-      <span class="logo-text"> CSS MALL</span>
-    </div>
+    <a class="nav-logo" href="home.html">
+      <img src="images/logo433.png" alt="CSS Mall" />
+      <span class="nav-logo-text">CSS <span>Mall</span></span>
+    </a>
     <ul class="nav-links">
       <li><a href="home.html">Home</a></li>
       <li><a href="shop.html">Shop</a></li>
-      <li><a href="coupon.html">Coupon</a></li>
-      <li class="dropdown">
-        <a href="#" class="dropbtn">My account</a>
-        <div class="dropdown-content">
+      <li><a href="coupon.html">Coupons</a></li>
+      <li class="nav-dropdown">
+        <span class="nav-dropdown-btn">My Account</span>
+        <div class="nav-dropdown-menu">
           <a href="acc.html">My Profile</a>
           <a href="myshop.html">My Shop</a>
-          <a href="login.html" id="logout-btn" class="logout-btn">Logout</a>
+          <a href="wishlist.html">Wishlist</a>
+          <a href="#" id="logout-btn" class="danger">Logout</a>
         </div>
       </li>
-      <li>
-        <a href="cart.html">
-          <img src="images/shopping-cart.png" class="cart-icon">
-          <span id="cart-count" class="cart-count-badge">0</span>
-        </a>
-      </li>
     </ul>
+    <div class="nav-icons">
+      <a href="wishlist.html" class="nav-icon-btn">♡</a>
+      <a href="cart.html" class="nav-icon-btn">
+        <img src="images/shopping-cart.png" alt="Cart" />
+        <span class="nav-badge" id="cart-count">0</span>
+      </a>
+    </div>
   </nav>
 
-  <main>
-    <section class="shop-header">
-      <h1 id="shop-name">My Shop</h1>
-      <div class="shop-meta">
-        <span>⭐ N/A</span> |
-        <span id="follower-count">0 followers</span>
+  <!-- Seller hero -->
+  <div class="seller-hero">
+    <div class="seller-avatar" id="seller-avatar">?</div>
+    <div class="seller-info">
+      <h1 id="seller-name">Loading…</h1>
+      <p>Official seller on CSS Mall</p>
+      <div class="seller-meta">
+        <span>📦 <strong id="product-count">—</strong> products</span>
       </div>
-    </section>
+    </div>
+    <div class="seller-actions" id="seller-actions">
+      <!-- "Manage My Shop" shown only if viewing own shop -->
+    </div>
+  </div>
 
-    <hr />
+  <!-- Toolbar -->
+  <div class="view-toolbar">
+    <span id="result-label">Loading products…</span>
+    <select class="sort-select" id="sort-select">
+      <option value="default">Sort: Default</option>
+      <option value="price-low">Price: Low → High</option>
+      <option value="price-high">Price: High → Low</option>
+    </select>
+  </div>
 
-    <section class="product-section">
-      <div class="product-header">
-        <h2>My Products</h2>
-        <a href="add-product.html" class="add-product-btn">+ Add New Product</a>
-      </div>
+  <!-- Products -->
+  <div class="products-wrap">
+    <div class="products-grid" id="product-grid"></div>
+  </div>
 
-      <!-- Grid like shop.html -->
-      <div id="product-grid" class="product-grid"></div>
-      <p id="no-products" class="no-products">No more product found.</p>
-    </section>
-  </main>
+  <div class="page-footer">© 2026 CSS Mall. All Rights Reserved.</div>
+  <div class="toast" id="toast"></div>
 
   <script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
-    authDomain: "mini-ecom-39979.firebaseapp.com",
-    projectId: "mini-ecom-39979",
-    storageBucket: "mini-ecom-39979.firebasestorage.app",
-    messagingSenderId: "43435045240",
-    appId: "1:43435045240:web:ba425c522e37b4c1a7d88d"
-  };
-  firebase.initializeApp(firebaseConfig);
-
-  const auth = firebase.auth();
-  const db = firebase.firestore();
-
-  const productGrid = document.getElementById("product-grid");
-  const noProducts = document.getElementById("no-products");
-
-  auth.onAuthStateChanged(user => {
-    if(!user){
-      window.location.href = "login.html";
-      return;
+    function showToast(msg, duration = 2500) {
+      const t = document.getElementById("toast");
+      t.textContent = msg; t.style.display = "flex";
+      clearTimeout(t._t); t._t = setTimeout(() => { t.style.display = "none"; }, duration);
     }
 
-    // Shop info
-    db.collection("users").doc(user.uid).get().then(doc => {
-      const data = doc.data() || {};
-      document.getElementById("shop-name").textContent = data.username || "My Shop";
-    });
+    const firebaseConfig = {
+      apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
+      authDomain: "mini-ecom-39979.firebaseapp.com",
+      projectId: "mini-ecom-39979",
+      storageBucket: "mini-ecom-39979.firebasestorage.app",
+      messagingSenderId: "43435045240",
+      appId: "1:43435045240:web:ba425c522e37b4c1a7d88d"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db   = firebase.firestore();
 
-    // Followers count
-    db.collection("follows").where("shopId","==",user.uid).get()
-      .then(snap => {
-        document.getElementById("follower-count").textContent = `${snap.size} followers`;
-      });
+    // Determine whose shop to show:
+    // ?uid=XXX  → show that seller's shop
+    // no param  → show the currently logged-in user's shop
+    const params   = new URLSearchParams(window.location.search);
+    const targetUid = params.get("uid"); // seller uid from URL
 
-    // Realtime listener for products
-    db.collection("users").doc(user.uid).collection("products")
-      .orderBy("createdAt","desc")
-      .onSnapshot(snapshot => {
-        productGrid.innerHTML = ""; // clear grid
-        if(snapshot.empty){
-          noProducts.style.display = "block";
-          return;
-        }
-        noProducts.style.display = "none";
+    let currentUser = null;
+    let allProducts = [];
 
-        snapshot.forEach(doc => {
-          const p = doc.data();
-          const card = document.createElement("div");
-          card.classList.add("product-card");
-          card.innerHTML = `
-            <img src="${p.imageUrl || 'images/placeholder.jpg'}" alt="${p.name}" />
-            <div class="product-info">
-              <h3>${p.name}</h3>
-              <p>${p.description || ''}</p>
-              <p class="price">$${p.price}</p>
-              <div class="product-buttons">
-                <button onclick="addToCart('${doc.id}')">Add to Cart</button>
-                <button onclick="buyNow('${doc.id}')">Buy Now</button>
-              </div>
-            </div>
-          `;
-          productGrid.appendChild(card);
+    auth.onAuthStateChanged(async user => {
+      currentUser = user;
+
+      document.getElementById("logout-btn").onclick = e => {
+        e.preventDefault(); auth.signOut().then(() => window.location.href = "login.html");
+      };
+
+      if (user) {
+        db.collection("carts").doc(user.uid).collection("items").onSnapshot(snap => {
+          let t = 0; snap.forEach(d => t += d.data().quantity || 0);
+          document.getElementById("cart-count").textContent = t;
         });
-      });
+      }
 
-    // Add to cart / buy now
-    window.addToCart = function(productId){
-      const ref = db.collection("carts").doc(user.uid).collection("items").doc(productId);
-      ref.get().then(doc=>{
-        if(doc.exists) return ref.update({quantity: doc.data().quantity+1});
-        else return ref.set({quantity:1});
-      }).then(()=> alert("Added to cart!"))
-      .catch(err=>alert(err.message));
-    }
+      // Decide which uid to load
+      const sellerUid = targetUid || (user ? user.uid : null);
+      if (!sellerUid) {
+        // Not logged in and no uid in URL → redirect to login
+        window.location.href = "login.html";
+        return;
+      }
 
-    window.buyNow = function(productId){
-      const ref = db.collection("carts").doc(user.uid).collection("items").doc(productId);
-      ref.get().then(doc=>{
-        if(doc.exists) return ref.update({quantity: doc.data().quantity+1});
-        else return ref.set({quantity:1});
-      }).then(()=> window.location.href="cart.html")
-      .catch(err=>alert(err.message));
-    }
+      // Load seller info
+      try {
+        const userSnap = await db.collection("users").doc(sellerUid).get();
+        const username = userSnap.exists ? (userSnap.data().username || "Seller") : "Seller";
+        document.getElementById("seller-name").textContent = username;
+        document.getElementById("seller-avatar").textContent = username.charAt(0).toUpperCase();
+        document.title = `${username}'s Shop — CSS Mall`;
+      } catch(_) {}
 
-    // Logout
-    document.getElementById("logout-btn").addEventListener("click", ()=>{
-      auth.signOut().then(()=>window.location.href="login.html");
+      // If viewing own shop, show "Manage My Shop" button
+      if (user && sellerUid === user.uid) {
+        document.getElementById("seller-actions").innerHTML =
+          `<a href="myshop.html" class="btn-manage">⚙️ Manage My Shop</a>
+           <a href="add-product.html" class="btn-manage" style="background:var(--brand);border-color:var(--brand);">＋ Add Product</a>`;
+      }
+
+      loadProducts(sellerUid);
     });
-  });
-  </script>
 
+    function loadProducts(sellerUid) {
+      const grid = document.getElementById("product-grid");
+
+      db.collection("products").where("sellerId", "==", sellerUid)
+        .onSnapshot(snapshot => {
+          allProducts = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          document.getElementById("product-count").textContent = allProducts.length;
+          renderProducts(allProducts);
+        }, err => {
+          grid.innerHTML = `<p style="color:var(--red);padding:20px;">Error: ${err.message}</p>`;
+        });
+    }
+
+    function renderProducts(products) {
+      const grid = document.getElementById("product-grid");
+      const label = document.getElementById("result-label");
+      grid.innerHTML = "";
+
+      if (products.length === 0) {
+        label.textContent = "No products";
+        grid.innerHTML = `
+          <div class="shop-empty">
+            <div class="empty-icon">📦</div>
+            <h3>No products yet</h3>
+            <p>This seller hasn't listed any products.</p>
+          </div>`;
+        return;
+      }
+
+      label.textContent = `${products.length} product${products.length !== 1 ? "s" : ""}`;
+      products.forEach(p => {
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.innerHTML = `
+          <div class="product-card-img">
+            <a href="product-detail.html?id=${p.id}">
+              <img src="${p.imageUrl || 'images/placeholder.jpg'}" alt="${p.name}" loading="lazy" />
+            </a>
+            <button class="card-wish-btn wish-btn" title="Save to wishlist">♡</button>
+          </div>
+          <div class="product-card-body">
+            <a href="product-detail.html?id=${p.id}">
+              <div class="product-card-name">${p.name}</div>
+            </a>
+            <div class="product-card-desc">${p.shortDesc || p.description || ''}</div>
+            <div class="product-card-price">$${Number(p.price).toFixed(2)}</div>
+            <div class="product-card-actions">
+              <button class="btn-add-to-cart" onclick="addToCart('${p.id}')">Add to Cart</button>
+              <button class="btn-buy-now-card" onclick="buyNow('${p.id}')">Buy Now</button>
+            </div>
+          </div>`;
+
+        card.querySelector(".wish-btn").addEventListener("click", function() {
+          toggleWishlist(p.id, this);
+        });
+        grid.appendChild(card);
+      });
+    }
+
+    // Sort
+    document.getElementById("sort-select").addEventListener("change", function() {
+      const sorted = [...allProducts];
+      if (this.value === "price-low")  sorted.sort((a,b) => a.price - b.price);
+      if (this.value === "price-high") sorted.sort((a,b) => b.price - a.price);
+      renderProducts(sorted);
+    });
+
+    function addToCart(productId) {
+      if (!currentUser) { showToast("Please log in first."); return; }
+      const ref = db.collection("carts").doc(currentUser.uid).collection("items").doc(productId);
+      ref.get()
+        .then(d => d.exists ? ref.update({ quantity: d.data().quantity + 1 }) : ref.set({ quantity: 1 }))
+        .then(() => showToast("Added to cart! 🛒"))
+        .catch(e => showToast(e.message));
+    }
+
+    function buyNow(productId) {
+      if (!currentUser) { showToast("Please log in first."); return; }
+      const ref = db.collection("carts").doc(currentUser.uid).collection("items").doc(productId);
+      ref.get()
+        .then(d => d.exists ? ref.update({ quantity: d.data().quantity + 1 }) : ref.set({ quantity: 1 }))
+        .then(() => window.location.href = "cart.html")
+        .catch(e => showToast(e.message));
+    }
+
+    async function toggleWishlist(productId, btn) {
+      if (!currentUser) { showToast("Please log in first."); return; }
+      const ref = db.collection("users").doc(currentUser.uid).collection("wishlist").doc(productId);
+      const d = await ref.get();
+      if (d.exists) {
+        await ref.delete();
+        btn.textContent = "♡"; btn.style.color = "";
+        showToast("Removed from wishlist");
+      } else {
+        const ps = await db.collection("products").doc(productId).get();
+        if (ps.exists) await ref.set({ ...ps.data(), savedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        btn.textContent = "♥"; btn.style.color = "#ef4444";
+        showToast("Saved to wishlist ♥");
+      }
+    }
+  </script>
 </body>
 </html>

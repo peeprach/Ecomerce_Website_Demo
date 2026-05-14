@@ -3,92 +3,86 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Shop Page</title>
-  <link rel="stylesheet" href="shop.css" />
+  <title>Shop — CSS Mall</title>
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/shop.css" />
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
 </head>
 <body>
-  <!-- Navigation -->
+  <!-- Navbar -->
   <nav class="navbar">
-    <div class="logo">
-      <img src="images/logo433.png" alt="DES403 Logo" class="logo-img">
-      <span class="logo-text"> CSS MALL</span>
-    </div>
+    <a class="nav-logo" href="home.html">
+      <img src="images/logo433.png" alt="CSS Mall" />
+      <span class="nav-logo-text">CSS <span>Mall</span></span>
+    </a>
     <ul class="nav-links">
       <li><a href="home.html">Home</a></li>
       <li><a href="shop.html" class="active">Shop</a></li>
-      <li><a href="coupon.html">Coupon</a></li>
-      <li class="dropdown">
-        <a href="#" class="dropbtn">My account</a>
-        <div class="dropdown-content">
+      <li><a href="coupon.html">Coupons</a></li>
+      <li class="nav-dropdown">
+        <span class="nav-dropdown-btn">My Account</span>
+        <div class="nav-dropdown-menu">
           <a href="acc.html">My Profile</a>
           <a href="myshop.html">My Shop</a>
-          <a href="login.html" id="logout-btn" class="logout-btn">Logout</a>
+          <a href="wishlist.html">Wishlist</a>
+          <a href="#" id="logout-btn" class="danger">Logout</a>
         </div>
       </li>
-      <li>
-        <a href="cart.html">
-          <img src="images/shopping-cart.png" class="cart-icon">
-          <span id="cart-count" class="cart-count-badge">0</span>
-        </a>
-      </li>
     </ul>
+    <div class="nav-icons">
+      <a href="wishlist.html" class="nav-icon-btn" title="Wishlist">♡</a>
+      <a href="cart.html" class="nav-icon-btn" title="Cart">
+        <img src="images/shopping-cart.png" alt="Cart" />
+        <span class="nav-badge" id="cart-count">0</span>
+      </a>
+    </div>
   </nav>
 
   <!-- Hero -->
-  <header class="hero-section">
-    <div class="hero-content">
-      <h1>Shop</h1>
-      <p id="breadcrumb">Home > <span>Shop</span></p>
-    </div>
-    <a href="#"><img src="images/Rectangle 1.png" alt="User"></a>
-    <div class="search-container">
-      <input type="text" id="search-input" placeholder="Search for products, brands and shops">
-      <button id="search-btn">🔍</button>
+  <header class="shop-hero">
+    <h1>Shop</h1>
+    <p>Home › Shop</p>
+    <div class="shop-search-row">
+      <input type="text" id="search-input" placeholder="Search products, brands, sellers…" />
+      <button id="search-btn">🔍 Search</button>
     </div>
   </header>
 
-  <!-- Filter & Sort -->
-  <section class="filter-sort">
-    <div class="filter-options">
-      <button class="filter-button active" data-filter="popular">Popular</button>
-      <button class="filter-button" data-filter="latest">Latest</button>
-      <button class="filter-button" data-filter="top-sales">Top Sales</button>
+  <!-- Toolbar -->
+  <div class="shop-toolbar">
+    <div class="filter-tabs">
+      <button class="filter-tab active" data-filter="popular">Popular</button>
+      <button class="filter-tab" data-filter="latest">Latest</button>
+      <button class="filter-tab" data-filter="top-sales">Top Sales</button>
     </div>
-    <span id="result-count">Showing products...</span>
-    <div class="sort-options">
-      <label for="sort">Sort by</label>
-      <select id="sort">
-        <option value="default">Default</option>
-        <option value="price-low">Price: Low to High</option>
-        <option value="price-high">Price: High to Low</option>
+    <div class="toolbar-right">
+      <span id="result-count">Loading…</span>
+      <select id="sort" class="sort-select">
+        <option value="default">Sort: Default</option>
+        <option value="price-low">Price: Low → High</option>
+        <option value="price-high">Price: High → Low</option>
       </select>
     </div>
-  </section>
+  </div>
 
-  <!-- Product Grid -->
-  <section id="product-grid" class="product-grid">
-    <!-- Products loaded dynamically -->
-  </section>
-
+  <!-- Grid -->
+  <div id="product-grid" class="product-grid"></div>
   <div class="pagination" id="pagination"></div>
 
   <!-- Footer -->
-  <footer class="footer">
-    <div class="footer-info">
-      <div><i class="icon-quality"></i> High Quality</div>
-      <div><i class="icon-warranty"></i> Warranty Protection</div>
-      <div><i class="icon-shipping"></i> Free Shipping</div>
-      <div><i class="icon-support"></i> 24/7 Support</div>
-    </div>
-    <div class="footer-links">
-      <p>© 2026 CSS Mall. &nbsp;&nbsp;&nbsp; All Rights Reserved.</p>
-    </div>
-  </footer>
+  <div class="shop-footer-strip">© 2026 CSS Mall. All Rights Reserved.</div>
+
+  <div class="toast" id="toast"></div>
 
   <script>
+    function showToast(msg, duration = 2500) {
+      const t = document.getElementById("toast");
+      t.textContent = msg; t.style.display = "flex";
+      clearTimeout(t._t); t._t = setTimeout(() => { t.style.display = "none"; }, duration);
+    }
+
     const firebaseConfig = {
       apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
       authDomain: "mini-ecom-39979.firebaseapp.com",
@@ -108,19 +102,50 @@
     const searchInput = document.getElementById("search-input");
     const searchBtn = document.getElementById("search-btn");
     const sortSelect = document.getElementById("sort");
-    const filterButtons = document.querySelectorAll(".filter-button");
+    const filterButtons = document.querySelectorAll(".filter-tab");
 
     let allProducts = [];
+    let wishlistSet = new Set();
 
     auth.onAuthStateChanged(user => {
       if(user){
         currentUser = user;
         listenToCartChanges();
+        loadWishlist();
       } else {
         currentUser = null;
         cartCountEl.innerText = "0";
+        wishlistSet.clear();
       }
     });
+
+    async function loadWishlist() {
+      if(!currentUser) return;
+      const snap = await db.collection("users").doc(currentUser.uid).collection("wishlist").get();
+      wishlistSet.clear();
+      snap.forEach(doc => wishlistSet.add(doc.id));
+    }
+
+    async function toggleWishlist(productId, btn) {
+      if(!currentUser){ showToast("Please log in first."); return; }
+      const ref = db.collection("users").doc(currentUser.uid).collection("wishlist").doc(productId);
+      if(wishlistSet.has(productId)){
+        await ref.delete();
+        wishlistSet.delete(productId);
+        btn.textContent = "♡";
+        btn.style.color = "#999";
+        showToast("Removed from wishlist");
+      } else {
+        const productSnap = await db.collection("products").doc(productId).get();
+        if(productSnap.exists){
+          await ref.set({ ...productSnap.data(), savedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        }
+        wishlistSet.add(productId);
+        btn.textContent = "♥";
+        btn.style.color = "#e53935";
+        showToast("Added to wishlist!");
+      }
+    }
 
     function listenToCartChanges() {
       if(!currentUser) return;
@@ -150,27 +175,35 @@
     function renderProducts(products) {
       productGrid.innerHTML = "";
       if(products.length === 0){
-        resultCount.innerText = "0 products found";
+        resultCount.innerText = "0 products";
+        productGrid.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><h3>No products found</h3><p>Try a different search or filter.</p></div>`;
         return;
       }
       products.forEach(p => {
         const card = document.createElement("div");
-        card.classList.add("product-card");
+        card.className = "product-card";
+        const wishlisted = wishlistSet.has(p.id);
         card.innerHTML = `
-          <img src="${p.imageUrl || 'images/placeholder.jpg'}" alt="${p.name}" />
-          <div class="product-info">
-            <h3>${p.name}</h3>
-            <p>${p.description || ''}</p>
-            <p class="price">CNY ${p.price}</p>
-            <div class="product-buttons">
-              <button onclick="addToCart('${p.id}')">Add to Cart</button>
-              <button onclick="buyNow('${p.id}')">Buy Now</button>
+          <div class="product-card-img">
+            <a href="product-detail.html?id=${p.id}">
+              <img src="${p.imageUrl || 'images/placeholder.jpg'}" alt="${p.name}" loading="lazy" />
+            </a>
+            <button class="card-wish-btn wish-btn" data-id="${p.id}" style="color:${wishlisted?'#ef4444':''}">${wishlisted?'♥':'♡'}</button>
+          </div>
+          <div class="product-card-body">
+            <a href="product-detail.html?id=${p.id}"><div class="product-card-name">${p.name}</div></a>
+            <div class="product-card-desc">${p.shortDesc || p.description || ''}</div>
+            <div class="product-card-price">$${Number(p.price).toFixed(2)}</div>
+            <div class="product-card-actions">
+              <button class="btn-add-to-cart" onclick="addToCart('${p.id}')">Cart</button>
+              <button class="btn-buy-now-card" onclick="buyNow('${p.id}')">Buy Now</button>
             </div>
           </div>
         `;
+        card.querySelector('.wish-btn').addEventListener('click', function(){ toggleWishlist(p.id, this); });
         productGrid.appendChild(card);
       });
-      resultCount.innerText = `${products.length} products found`;
+      resultCount.innerText = `${products.length} product${products.length!==1?'s':''}`;
     }
     db.collection("products").orderBy("name").onSnapshot(snapshot=>{
       allProducts = snapshot.docs.map(doc=>({ id: doc.id, ...doc.data() }));
@@ -178,7 +211,7 @@
     });
 
     function addToCart(productId){
-      if(!currentUser){ alert("Please log in first."); return; }
+      if(!currentUser){ showToast("Please log in first."); return; }
       const ref = db.collection("carts").doc(currentUser.uid)
         .collection("items").doc(productId);
       ref.get().then(doc => {
@@ -187,12 +220,12 @@
         } else {
           return ref.set({ quantity: 1 });
         }
-      }).then(()=> alert("Added to cart!"))
-      .catch(err=> alert(err.message));
+      }).then(()=> showToast("Added to cart!"))
+      .catch(err=> showToast(err.message));
     }
 
     function buyNow(productId){
-      if(!currentUser){ alert("Please log in first."); return; }
+      if(!currentUser){ showToast("Please log in first."); return; }
       const ref = db.collection("carts").doc(currentUser.uid)
         .collection("items").doc(productId);
       ref.get().then(doc => {
@@ -202,7 +235,7 @@
           return ref.set({ quantity: 1 });
         }
       }).then(()=> window.location.href="cart.html")
-      .catch(err=> alert(err.message));
+      .catch(err=> showToast(err.message));
     }
 
     searchBtn.addEventListener("click", ()=> {
@@ -230,7 +263,8 @@
       });
     });
 
-    document.getElementById("logout-btn").addEventListener("click", ()=>{
+    document.getElementById("logout-btn").addEventListener("click", e=>{
+      e.preventDefault();
       auth.signOut().then(()=> window.location.href="login.html");
     });
 

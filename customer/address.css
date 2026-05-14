@@ -18,7 +18,7 @@ body, html {
 }
   
   .cart-icon {
-    width: 24px; /* ปรับขนาดไอคอนตามต้องการ */
+    width: 24px; 
     height: auto;
     vertical-align: middle;
     margin-top: -5px;
@@ -27,7 +27,7 @@ body, html {
   .logo {
     display: flex;
     align-items: center;
-    gap: 20px; /* ปรับระยะห่าง */
+    gap: 20px; 
   }
   
   .logo img {
@@ -42,15 +42,15 @@ body, html {
     display: flex;
     align-items: center;
     position: relative;
-    padding-left: 20px; /* เพิ่มช่องว่างระหว่างเส้นกับข้อความ */
+    padding-left: 20px; 
   }
   
   .logo-text::before {
     content: "";
     display: inline-block;
-    width: 2px; /* ความกว้างของเส้น */
-    height: 30px; /* ความยาวของเส้น */
-    background-color: #aaa; /* สีของเส้น */
+    width: 2px; 
+    height: 30px; 
+    background-color: #aaa; 
     position: absolute;
     left: 0;
     top: 50%;
@@ -132,14 +132,14 @@ body, html {
 .menu ul li a {
   display: flex;
   align-items: center;
-  gap: 12px; /* ระยะห่างระหว่างไอคอนกับข้อความ */
+  gap: 12px; 
   padding: 8px;
   font-size: 14px;
   text-decoration: none;
   color: black;
 }
 .menu ul li a .icon {
-  width: 24px;  /* ปรับขนาดไอคอน */
+  width: 24px;  
   height: 24px;
 }
 
@@ -148,11 +148,11 @@ body, html {
   padding-left: 20px;
 }
 .submenu.show {
-  display: block; /* แสดงเมนูเมื่อมี class 'show' */
+  display: block; /*  class 'show' */
 }
 
 .menu ul li:hover .submenu {
-  display: block; /* แสดงเมนูย่อยเมื่อ hover */
+  display: block; /*  hover */
 }
 
 .submenu li {
@@ -270,7 +270,7 @@ display: block;
 }
 
 .dropdown-content a:hover {
-background-color: #f9f9f9; /* หรือไม่ต้องใส่ก็ได้ */
+background-color: #f9f9f9; 
 color: #ffc107;
 }
 
@@ -344,8 +344,8 @@ display: block;
 /* ================== Checkbox row ================== */
 .checkbox-row {
   display: flex;
-  align-items: center;  /* จัดให้ checkbox และ label อยู่กึ่งกลางบรรทัดเดียวกัน */
-  gap: 5px;             /* เว้นระยะระหว่าง checkbox กับ label */
+  align-items: center;  /*  checkbox  label  */
+  gap: 5px;             /*  checkbox  label */
   margin-top: 10px;
 }
 
@@ -424,15 +424,15 @@ display: block;
 .subtitle-with-button {
   display: flex;
   align-items: center;
-  gap: 10px; /* ช่องว่างระหว่างข้อความกับปุ่ม */
+  gap: 10px; 
 }
 
 .profile-subtitle {
-  margin: 0; /* ปรับ margin ให้ไม่มีช่องว่างเยอะ */
+  margin: 0; /*  margin  */
 }
 
 .address-detail {
-  color: #373737; /* ตัวหนังสือสีเทาอ่อน */
+  color: #373737; 
   margin-bottom: 12px;
   font-weight: 100;
   line-height: 30px;
@@ -440,7 +440,7 @@ display: block;
 }
 .address-header {
   font-weight: bold;
-  /* ตัวหนังสือเข้ม */
+  
 }
 .address-item {
   border-bottom: 1px solid #ccc;

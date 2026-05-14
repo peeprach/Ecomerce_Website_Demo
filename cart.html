@@ -1,255 +1,464 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Shopping Cart</title>
-    <link rel="stylesheet" href="cart.css" />
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Shopping Cart — CSS Mall</title>
+  <link rel="stylesheet" href="css/global.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+  <style>
+    body { background: var(--light); }
+
+    /* Hero */
+    .page-hero {
+      background: linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);
+      padding: 40px 48px 36px;
+      color:#fff;
+    }
+    .page-hero h1 { font-size:28px; font-weight:800; margin-bottom:4px; }
+    .page-hero p  { font-size:13px; color:rgba(255,255,255,.55); font-weight:400; }
+
+    /* Layout */
+    .cart-layout {
+      display: grid;
+      grid-template-columns: 1fr 360px;
+      gap: 24px;
+      max-width: 1200px;
+      margin: 32px auto;
+      padding: 0 24px 60px;
+      align-items: start;
+    }
+
+    /* Card wrapper */
+    .cart-card {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .cart-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid #f3f4f6;
+    }
+    .cart-card-header h2 { font-size:16px; font-weight:700; color:var(--dark); }
+    .cart-card-header span { font-size:13px; color:var(--muted); }
+
+    /* Cart item row */
+    .cart-item {
+      display: grid;
+      grid-template-columns: 80px 1fr auto auto auto;
+      align-items: center;
+      gap: 16px;
+      padding: 18px 24px;
+      border-bottom: 1px solid #f3f4f6;
+      transition: background .15s;
+    }
+    .cart-item:last-child { border-bottom: none; }
+    .cart-item:hover { background: #fafafa; }
+
+    .cart-item-img {
+      width: 80px; height: 80px;
+      border-radius: var(--radius);
+      object-fit: cover;
+      border: 1px solid #f0f0f0;
+      flex-shrink: 0;
+    }
+    .cart-item-info { min-width: 0; }
+    .cart-item-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--dark);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 4px;
+    }
+    .cart-item-price { font-size: 13px; color: var(--muted); }
+
+    /* Qty control */
+    .qty-ctrl {
+      display: flex;
+      align-items: center;
+      border: 1.5px solid #e5e7eb;
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .qty-ctrl button {
+      width: 34px; height: 36px;
+      background: #f9fafb;
+      border: none;
+      font-size: 18px;
+      cursor: pointer;
+      color: var(--dark2);
+      transition: background .15s;
+      font-family: var(--font);
+    }
+    .qty-ctrl button:hover { background: var(--brand-light); color: var(--brand-dark); }
+    .qty-ctrl .qty-val {
+      width: 40px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 700; color: var(--dark);
+      border-left: 1.5px solid #e5e7eb;
+      border-right: 1.5px solid #e5e7eb;
+    }
+
+    .cart-item-subtotal {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--red);
+      min-width: 70px;
+      text-align: right;
+    }
+    .remove-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--muted);
+      font-size: 18px;
+      padding: 4px 8px;
+      border-radius: var(--radius-sm);
+      transition: color .15s, background .15s;
+    }
+    .remove-btn:hover { color: var(--red); background: #fef2f2; }
+
+    /* Empty cart */
+    .cart-empty {
+      text-align: center;
+      padding: 70px 20px;
+    }
+    .cart-empty .empty-icon { font-size: 64px; margin-bottom: 16px; }
+    .cart-empty h3 { font-size: 20px; font-weight: 800; color: var(--dark); margin-bottom: 8px; }
+    .cart-empty p  { font-size: 14px; color: var(--gray); font-weight: 400; margin-bottom: 24px; }
+
+    /* Sticky summary card */
+    .summary-card {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      position: sticky;
+      top: 90px;
+    }
+    .summary-card h2 { font-size: 16px; font-weight: 700; color: var(--dark); margin-bottom: 20px; }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      margin-bottom: 12px;
+    }
+    .summary-row .label { color: var(--gray); font-weight: 400; }
+    .summary-row .value { font-weight: 600; color: var(--dark2); }
+    .summary-divider { border: none; border-top: 1px solid #f0f0f0; margin: 16px 0; }
+    .summary-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .summary-total-row .label { font-size: 15px; font-weight: 700; color: var(--dark); }
+    .summary-total-row .value { font-size: 20px; font-weight: 800; color: var(--red); }
+
+    .btn-checkout {
+      width: 100%;
+      padding: 14px;
+      background: var(--brand);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-lg);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: background .2s;
+      margin-bottom: 12px;
+    }
+    .btn-checkout:hover { background: var(--brand-dark); }
+    .btn-continue {
+      display: block;
+      text-align: center;
+      font-size: 13px;
+      color: var(--gray);
+      font-weight: 500;
+      padding: 8px;
+      border-radius: var(--radius);
+      text-decoration: none;
+      transition: background .15s;
+    }
+    .btn-continue:hover { background: var(--light); color: var(--dark2); }
+
+    .shipping-note {
+      background: var(--brand-light);
+      border: 1px solid var(--brand-border);
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      font-size: 12px;
+      color: #92400e;
+      text-align: center;
+      margin-bottom: 16px;
+      font-weight: 500;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px) {
+      .cart-layout { grid-template-columns: 1fr; padding: 0 16px 40px; }
+      .summary-card { position: static; }
+      .page-hero { padding: 32px 20px; }
+    }
+    @media (max-width: 560px) {
+      .cart-item { grid-template-columns: 64px 1fr; grid-template-rows: auto auto; gap: 10px; }
+      .cart-item-img { width:64px; height:64px; }
+      .cart-item-subtotal { grid-column: 2; justify-self: start; }
+      .qty-ctrl, .remove-btn { grid-column: 2; }
+    }
+  </style>
 </head>
 <body>
-    <nav class="navbar">
-        <div class="logo">
-          <img src="images/logo433.png" alt="DES403 Logo" class="logo-img">
-          <span class="logo-text"> CSS MALL</span>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a class="nav-logo" href="home.html">
+      <img src="images/logo433.png" alt="CSS Mall" />
+      <span class="nav-logo-text">CSS <span>Mall</span></span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="home.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="coupon.html">Coupons</a></li>
+      <li class="nav-dropdown">
+        <span class="nav-dropdown-btn">My Account</span>
+        <div class="nav-dropdown-menu">
+          <a href="acc.html">My Profile</a>
+          <a href="myshop.html">My Shop</a>
+          <a href="wishlist.html">Wishlist</a>
+          <a href="#" id="logout-btn" class="danger">Logout</a>
         </div>
-        <ul class="nav-links">
-          <li><a href="home.html" class="active">Home</a></li>
-          <li><a href="shop.html">Shop</a></li>
-          <li><a href="coupon.html">Coupon</a></li>
-          <li class="dropdown">
-            <a href="#" class="dropbtn">My account</a>
-            <div class="dropdown-content">
-              <a href="acc.html">My Profile</a>
-              <a href="myshop.html">My Shop</a>
-              <a href="login.html" id="logout-btn" class="logout-btn">Logout</a>
-            </div>
-          </li> 
-          <li>
-            <a href="cart.html">
-              <img src="images/shopping-cart.png" alt="Cart" class="cart-icon">
-              <span id="cart-count" class="cart-count-badge">0</span>
-            </a>
-          </li>
-        </ul>
-    </nav>
+      </li>
+    </ul>
+    <div class="nav-icons">
+      <a href="wishlist.html" class="nav-icon-btn" title="Wishlist">♡</a>
+      <a href="cart.html" class="nav-icon-btn" title="Cart">
+        <img src="images/shopping-cart.png" alt="Cart" />
+        <span class="nav-badge" id="cart-count">0</span>
+      </a>
+    </div>
+  </nav>
 
-    <header class="hero-section">
-        <div class="hero-content">
-            <h1>Shopping Cart</h1>
-            <p>Home &gt; Cart</p>
-        </div>
-    </header>
+  <!-- Hero -->
+  <div class="page-hero">
+    <h1>Shopping Cart</h1>
+    <p>Home › Cart</p>
+  </div>
 
-    <main>
-        <table class="cart-table">
-            <thead>
-                <tr>
-                    <th>Product</th>
-                    <th>Price</th>
-                    <th>Quantity</th>
-                    <th>Subtotal</th>
-                    <th>Action</th>
-                </tr>
-            </thead>
-            <tbody id="cart-items">
-                <!-- Items will be dynamically inserted here -->
-            </tbody>
-        </table>
+  <!-- Layout -->
+  <div class="cart-layout">
 
-        <div class="cart-total">
-            <p>Total: <span id="cart-total">CNY0</span></p>
-            <button class="checkout-btn">Proceed to Checkout</button>
-        </div>
-    </main>
+    <!-- Left: items -->
+    <div class="cart-card">
+      <div class="cart-card-header">
+        <h2>Cart Items</h2>
+        <span id="item-count-label">Loading…</span>
+      </div>
+      <div id="cart-items-wrap">
+        <!-- rendered by JS -->
+      </div>
+    </div>
 
-    <footer>
-        <p style="text-align: center;">© 2026 CSS Mall. &nbsp;&nbsp;&nbsp; All Rights Reserved.</p>
-    </footer>
+    <!-- Right: summary -->
+    <div class="summary-card">
+      <h2>Order Summary</h2>
+      <div class="shipping-note" id="shipping-note">🚚 Add 1 more item for free shipping!</div>
+      <div class="summary-row">
+        <span class="label">Subtotal</span>
+        <span class="value" id="summary-subtotal">$0.00</span>
+      </div>
+      <div class="summary-row">
+        <span class="label">Shipping</span>
+        <span class="value" id="summary-shipping">$9.00</span>
+      </div>
+      <hr class="summary-divider" />
+      <div class="summary-total-row">
+        <span class="label">Total</span>
+        <span class="value" id="cart-total">$0.00</span>
+      </div>
+      <button class="btn-checkout checkout-btn">Proceed to Checkout →</button>
+      <a href="shop.html" class="btn-continue">← Continue Shopping</a>
+    </div>
+  </div>
 
-    <script>
+  <div class="toast" id="toast"></div>
+
+  <script>
+    function showToast(msg, duration = 2500) {
+      const t = document.getElementById("toast");
+      t.textContent = msg; t.style.display = "flex";
+      clearTimeout(t._t); t._t = setTimeout(() => { t.style.display = "none"; }, duration);
+    }
+
     const firebaseConfig = {
-        apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
-        authDomain: "mini-ecom-39979.firebaseapp.com",
-        projectId: "mini-ecom-39979",
-        storageBucket: "mini-ecom-39979.firebasestorage.app",
-        messagingSenderId: "43435045240",
-        appId: "1:43435045240:web:ba425c522e37b4c1a7d88d"
+      apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
+      authDomain: "mini-ecom-39979.firebaseapp.com",
+      projectId: "mini-ecom-39979",
+      storageBucket: "mini-ecom-39979.firebasestorage.app",
+      messagingSenderId: "43435045240",
+      appId: "1:43435045240:web:ba425c522e37b4c1a7d88d"
     };
-
     firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
+    const db   = firebase.firestore();
     const auth = firebase.auth();
 
-    const cartItemsContainer = document.getElementById("cart-items");
+    const wrap        = document.getElementById("cart-items-wrap");
     const cartTotalEl = document.getElementById("cart-total");
+    const subtotalEl  = document.getElementById("summary-subtotal");
+    const shippingEl  = document.getElementById("summary-shipping");
+    const shippingNote= document.getElementById("shipping-note");
+    const countLabel  = document.getElementById("item-count-label");
+    const cartCountEl = document.getElementById("cart-count");
+    const shippingFreeThreshold = 2;
+    const shippingFee = 9;
     let currentUser = null;
 
-    // 🔄 load
     function renderCartItems() {
-        if (!currentUser) {
-            cartItemsContainer.innerHTML = `
-                <tr><td colspan="5" style="text-align:center;">Please log in.</td></tr>
-            `;
-            cartTotalEl.textContent = "CNY0";
-            return;
+      if (!currentUser) {
+        wrap.innerHTML = `<div class="cart-empty"><div class="empty-icon">🔐</div><h3>Sign in to view your cart</h3><p>Log in to see your saved items.</p><a href="login.html" class="btn btn-primary">Log In</a></div>`;
+        countLabel.textContent = "";
+        return;
+      }
+
+      const cartRef = db.collection("carts").doc(currentUser.uid).collection("items");
+      cartRef.get().then(cartSnapshot => {
+        if (cartSnapshot.empty) {
+          wrap.innerHTML = `<div class="cart-empty"><div class="empty-icon">🛒</div><h3>Your cart is empty</h3><p>Looks like you haven't added anything yet.</p><a href="shop.html" class="btn btn-primary">Start Shopping</a></div>`;
+          countLabel.textContent = "0 items";
+          updateSummary(0, 0);
+          return;
         }
 
-        const cartRef = db.collection("carts").doc(currentUser.uid).collection("items");
-        cartRef.get().then(cartSnapshot => {
-            if (cartSnapshot.empty) {
-                cartItemsContainer.innerHTML = `
-                    <tr><td colspan="5" style="text-align:center;">Your cart is empty.</td></tr>
-                `;
-                cartTotalEl.textContent = "CNY0";
-                return;
+        wrap.innerHTML = "";
+        let total = 0;
+        let totalQty = 0;
+        const promises = [];
+
+        cartSnapshot.forEach(docSnap => {
+          const item = docSnap.data();
+          const productId = item.productId || docSnap.id;
+          totalQty += item.quantity;
+
+          const p = db.collection("products").doc(productId).get().then(async productSnap => {
+            if (!productSnap.exists) return;
+            const product = productSnap.data();
+            const subtotal = product.price * item.quantity;
+            total += subtotal;
+
+            // Fetch seller username for "Sold by" label
+            let sellerName = "";
+            if (product.sellerId) {
+              try {
+                const uSnap = await db.collection("users").doc(product.sellerId).get();
+                if (uSnap.exists) sellerName = uSnap.data().username || "";
+              } catch(_) {}
             }
 
-            cartItemsContainer.innerHTML = "";
-            let total = 0;
-            const promises = [];
+            const row = document.createElement("div");
+            row.className = "cart-item";
+            row.id = `cart-row-${docSnap.id}`;
+            row.innerHTML = `
+              <img class="cart-item-img" src="${product.imageUrl || 'images/placeholder.jpg'}" alt="${product.name}" />
+              <div class="cart-item-info">
+                <div class="cart-item-name">
+                  <a href="product-detail.html?id=${docSnap.id}" style="color:inherit;text-decoration:none;">${product.name}</a>
+                </div>
+                ${sellerName ? `<div style="font-size:12px;color:var(--muted);margin-top:2px;">🏪 Sold by <a href="viewshop.html?uid=${product.sellerId}" style="color:var(--brand-dark);font-weight:600;">${sellerName}</a></div>` : ""}
+                <div class="cart-item-price">$${Number(product.price).toFixed(2)} each</div>
+              </div>
+              <div class="qty-ctrl">
+                <button class="qty-minus">−</button>
+                <div class="qty-val" id="qty-${docSnap.id}">${item.quantity}</div>
+                <button class="qty-plus">+</button>
+              </div>
+              <div class="cart-item-subtotal" id="subtotal-${docSnap.id}">$${subtotal.toFixed(2)}</div>
+              <button class="remove-btn" title="Remove">✕</button>
+            `;
+            wrap.appendChild(row);
 
-            cartSnapshot.forEach(docSnap => {
-                const item = docSnap.data();
-                const productId = item.productId || docSnap.id;
-
-                const p = db.collection("products").doc(productId).get().then(productSnap => {
-                    if (!productSnap.exists) return;
-
-                    const product = productSnap.data();
-                    const subtotal = product.price * item.quantity;
-                    total += subtotal;
-
-                    cartItemsContainer.innerHTML += `
-                      <tr id="cart-row-${docSnap.id}">
-                          <td>
-                              <img src="${product.imageUrl || 'images/placeholder.jpg'}" alt="${product.name}" style="width:50px;height:50px;object-fit:cover;margin-right:10px;">
-                              ${product.name}
-                          </td>
-                          <td>CNY${product.price}</td>
-                          <td>
-                              <button onclick="updateQuantity('${docSnap.id}', -1)">-</button>
-                              <span id="qty-${docSnap.id}">${item.quantity}</span>
-                              <button onclick="updateQuantity('${docSnap.id}', 1)">+</button>
-                          </td>
-                          <td id="subtotal-${docSnap.id}">CNY${subtotal}</td>
-                          <td>
-                              <button onclick="removeFromCart('${docSnap.id}')">Remove</button>
-                          </td>
-                      </tr>
-                  `;
-              });
-              promises.push(p);
-            });
-
-            Promise.all(promises).then(() => {
-                cartTotalEl.textContent = `CNY ${total}`;
-            });
+            // qty controls
+            let qty = item.quantity;
+            row.querySelector(".qty-minus").onclick = async () => {
+              if (qty <= 1) return;
+              qty--;
+              row.querySelector(`#qty-${docSnap.id}`).textContent = qty;
+              row.querySelector(`#subtotal-${docSnap.id}`).textContent = `$${(product.price * qty).toFixed(2)}`;
+              await cartRef.doc(docSnap.id).update({ quantity: qty });
+              renderCartItems();
+            };
+            row.querySelector(".qty-plus").onclick = async () => {
+              qty++;
+              row.querySelector(`#qty-${docSnap.id}`).textContent = qty;
+              row.querySelector(`#subtotal-${docSnap.id}`).textContent = `$${(product.price * qty).toFixed(2)}`;
+              await cartRef.doc(docSnap.id).update({ quantity: qty });
+              renderCartItems();
+            };
+            row.querySelector(".remove-btn").onclick = () => removeFromCart(docSnap.id);
+          });
+          promises.push(p);
         });
+
+        Promise.all(promises).then(() => {
+          countLabel.textContent = `${totalQty} item${totalQty !== 1 ? "s" : ""}`;
+          updateSummary(total, totalQty);
+        });
+      });
     }
-    function updateQuantity(itemDocId, change) {
-        if (!currentUser) return alert("Please log in first.");
 
-        const itemRef = db.collection("carts").doc(currentUser.uid).collection("items").doc(itemDocId);
-
-        itemRef.get().then(doc => {
-          if (!doc.exists) return;
-          let newQty = doc.data().quantity + change;
-          if (newQty < 1) newQty = 1; // อย่าให้ต่ำกว่า 1
-          itemRef.update({ quantity: newQty }).then(() => {
-            // อัปเดตแค่ DOM โดยไม่ต้องโหลดใหม่ทั้งหน้า
-            document.getElementById(`qty-${itemDocId}`).textContent = newQty;
-
-            const productId = doc.data().productId || itemDocId;
-            db.collection("products").doc(productId).get().then(productSnap => {
-                if (!productSnap.exists) return;
-                const product = productSnap.data();
-                document.getElementById(`subtotal-${itemDocId}`).textContent = `CNY${product.price * newQty}`;
-                updateCartTotal(); // อัปเดต total
-            });
-          });
-        });
-      }
-      function updateCartTotal() {
-          const cartRef = db.collection("carts").doc(currentUser.uid).collection("items");
-          cartRef.get().then(cartSnapshot => {
-              let total = 0;
-              const promises = [];
-
-              cartSnapshot.forEach(docSnap => {
-                  const item = docSnap.data();
-                  const productId = item.productId || docSnap.id;
-                  const p = db.collection("products").doc(productId).get().then(productSnap => {
-                      if (!productSnap.exists) return;
-                      const product = productSnap.data();
-                      total += product.price * item.quantity;
-                  });
-                  promises.push(p);
-              });
-
-              Promise.all(promises).then(() => {
-                  cartTotalEl.textContent = `CNY ${total}`;
-              });
-          });
-        }
+    function updateSummary(subtotal, totalQty) {
+      const shipping = totalQty > shippingFreeThreshold ? 0 : (totalQty > 0 ? shippingFee : 0);
+      subtotalEl.textContent  = `$${subtotal.toFixed(2)}`;
+      shippingEl.textContent  = shipping === 0 ? (totalQty > 0 ? "Free 🎉" : "$0.00") : `$${shipping.toFixed(2)}`;
+      cartTotalEl.textContent = `$${(subtotal + shipping).toFixed(2)}`;
+      const needed = shippingFreeThreshold - totalQty + 1;
+      shippingNote.textContent = totalQty > shippingFreeThreshold
+        ? "🎉 You have free shipping!"
+        : `🚚 Add ${needed} more item${needed !== 1 ? "s" : ""} for free shipping!`;
+      shippingNote.style.background = totalQty > shippingFreeThreshold ? "#f0fdf4" : "var(--brand-light)";
+      shippingNote.style.color      = totalQty > shippingFreeThreshold ? "#15803d" : "#92400e";
+      shippingNote.style.borderColor= totalQty > shippingFreeThreshold ? "#bbf7d0" : "var(--brand-border)";
+    }
 
     async function removeFromCart(itemDocId) {
-        if (!currentUser) return alert("Please log in first.");
-
-        try {
-            await db
-                .collection("carts")
-                .doc(currentUser.uid)
-                .collection("items")
-                .doc(itemDocId)
-                .delete();
-
-            renderCartItems();
-        } catch (error) {
-            alert(error.message);
-        }
+      if (!currentUser) return;
+      await db.collection("carts").doc(currentUser.uid).collection("items").doc(itemDocId).delete();
+      renderCartItems();
+      showToast("Item removed");
     }
 
     auth.onAuthStateChanged(user => {
-        currentUser = user;
-        renderCartItems();
-    });
-
-    // 🚪 Logout
-    document.getElementById("logout-btn").addEventListener("click", () => {
-        auth.signOut().then(() => {
-            window.location.href = "login.html";
-        });
-    });
-
-    // 💳 Checkout
-    document.querySelector(".checkout-btn").addEventListener("click", () => {
-        if (!currentUser) {
-            alert("Please log in first.");
-            return;
-        }
-        window.location.href = "checkout.html";
-    });
-
-    const cartCountEl = document.getElementById("cart-count");
-    //cart = real-time
-    function listenToCartChanges() {
-        if(!currentUser) return;
-
-        db.collection("carts").doc(currentUser.uid)
-          .collection("items")
-          .onSnapshot(snapshot => {
-            let totalQty = 0;
-            snapshot.forEach(doc => totalQty += doc.data().quantity || 0);
-            cartCountEl.innerText = totalQty;
-        });
-    }
-      auth.onAuthStateChanged(user => {
       currentUser = user;
-      listenToCartChanges(); 
-  });
+      renderCartItems();
+
+      document.getElementById("logout-btn").onclick = e => {
+        e.preventDefault(); auth.signOut().then(() => window.location.href = "login.html");
+      };
+
+      if (user) {
+        db.collection("carts").doc(user.uid).collection("items")
+          .onSnapshot(snap => {
+            let t = 0; snap.forEach(d => t += d.data().quantity || 0);
+            cartCountEl.textContent = t;
+          });
+      } else {
+        cartCountEl.textContent = "0";
+      }
+    });
+
+    document.querySelector(".checkout-btn").onclick = () => {
+      if (!currentUser) { showToast("Please log in first."); return; }
+      window.location.href = "checkout.html";
+    };
   </script>
 </body>
 </html>

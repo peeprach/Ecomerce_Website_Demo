@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login Page</title>
-  <link rel="stylesheet" href="login.css">
+  <title>Login — CSS Mall</title>
+  <link rel="stylesheet" href="css/global.css">
+  <link rel="stylesheet" href="css/login.css">
   <!-- Firebase UMD Build -->
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
@@ -12,48 +13,87 @@
 </head>
 <body>
 
-  <!-- Navigation Bar -->
-  <nav class="navbar">
-    <div class="logo">
-      <img src="images/logo433.png" alt="DES403 Logo" class="logo-img">
-      <span class="logo-text"> CSS MALL</span>
+  <div class="login-page">
+    <!-- Left panel -->
+    <div class="login-left">
+      <div class="login-brand">
+        <img src="images/logo433.png" alt="CSS Mall" />
+        <h1>CSS <span>Mall</span></h1>
+        <p>The best online shopping destination</p>
+      </div>
+      <div class="login-perks">
+        <div class="login-perk">
+          <span class="login-perk-ico">🚚</span>
+          <div><strong>Free Shipping</strong><span>On orders over 2 items</span></div>
+        </div>
+        <div class="login-perk">
+          <span class="login-perk-ico">🛍️</span>
+          <div><strong>Thousands of Products</strong><span>From verified local sellers</span></div>
+        </div>
+        <div class="login-perk">
+          <span class="login-perk-ico">🔒</span>
+          <div><strong>Secure & Trusted</strong><span>End-to-end encrypted payments</span></div>
+        </div>
+        <div class="login-perk">
+          <span class="login-perk-ico">↩️</span>
+          <div><strong>Easy Returns</strong><span>30-day hassle-free returns</span></div>
+        </div>
+      </div>
     </div>
-  </nav>
 
-  <section class="login-container">
-    <!-- Left Side (Logo) -->
-    <div class="left-side">
-      <img src="images/logo433.png" alt="CSS MALL Logo" class="large-logo">
-      <h2>The best online shopping destinations.</h2>
-    </div>
+    <!-- Right panel -->
+    <div class="login-right">
+      <div class="login-form-wrap">
+        <h2>Welcome back</h2>
+        <p>New here? <a href="signup.html">Create a free account</a></p>
 
-    <div class="login-form">
-      <h2>Log in</h2>
-      <form id="login-form">
-        <label for="email">Email</label>
-        <input type="email" id="email" name="email" placeholder="Enter your email" required>
-        <label for="password">Password</label>
-        <input type="password" id="password" name="password" placeholder="Enter your password" required>
-        <button type="submit" class="btn-login">LOG IN</button>
-        <p>Don't have an account? <a href="signup.html"> Sign Up</a></p>
-        <p style="margin-top:30px">Or, login with</p>
-        
-        <button type="button" class="btn-login-with-icon btn-google">
-          <img src="images/google.png"> Sign in with Google
-        </button>
+        <!-- Forgot password box -->
+        <div class="forgot-box" id="forgot-section">
+          <p>Enter your email and we'll send a reset link.</p>
+          <input type="email" id="reset-email" placeholder="Your email address" />
+          <p id="reset-message"></p>
+          <div class="forgot-actions">
+            <button class="btn-send-reset" id="send-reset-btn" type="button">Send Reset Link</button>
+            <button class="btn-cancel-reset" id="back-to-login-link" type="button">Cancel</button>
+          </div>
+        </div>
 
-        <button type="button" class="btn-login-with-icon btn-apple">
-          <img src="images/apple.png"> Sign in with Apple
-        </button>
+        <form id="login-form">
+          <div class="form-field">
+            <label for="email">Email</label>
+            <input type="email" id="email" placeholder="you@example.com" required />
+          </div>
+          <div class="form-field">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Your password" required />
+          </div>
 
-        <button type="button" class="btn-login-with-icon btn-phone">
-          <img src="images/phone.png"> Sign in with Phone
-        </button>
+          <div class="forgot-row">
+            <span class="forgot-link" id="forgot-password-link">Forgot password?</span>
+          </div>
+
+          <button type="submit" class="btn-login-submit">Log In</button>
+        </form>
+
+        <div class="divider">or continue with</div>
+
+        <div class="social-btns">
+          <button type="button" class="btn-social btn-google">
+            <img src="images/google.png" alt="Google" /> Sign in with Google
+          </button>
+          <button type="button" class="btn-social btn-apple">
+            <img src="images/apple.png" alt="Apple" /> Sign in with Apple
+          </button>
+          <button type="button" class="btn-social btn-phone">
+            <img src="images/phone.png" alt="Phone" /> Sign in with Phone
+          </button>
+        </div>
+
         <p id="login-message"></p>
         <div id="recaptcha-container"></div>
-      </form>
+      </div>
     </div>
-  </section>
+  </div>
 
   <script>
   // ✅ Firebase NEW project
@@ -117,6 +157,34 @@
       })
       .catch((error) => {
         document.getElementById('login-message').innerText = error.message;
+      });
+  });
+
+  // ===== Forgot Password =====
+  document.getElementById('forgot-password-link').addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('forgot-section').style.display = 'block';
+  });
+
+  document.getElementById('back-to-login-link').addEventListener('click', (e) => {
+    e.preventDefault();
+    document.getElementById('forgot-section').style.display = 'none';
+    document.getElementById('reset-message').innerText = '';
+  });
+
+  document.getElementById('send-reset-btn').addEventListener('click', () => {
+    const email = document.getElementById('reset-email').value.trim();
+    const msg = document.getElementById('reset-message');
+    if (!email) { msg.style.color = 'red'; msg.innerText = 'Please enter your email.'; return; }
+
+    auth.sendPasswordResetEmail(email)
+      .then(() => {
+        msg.style.color = 'green';
+        msg.innerText = 'Reset link sent! Check your inbox.';
+      })
+      .catch((error) => {
+        msg.style.color = 'red';
+        msg.innerText = error.message;
       });
   });
 

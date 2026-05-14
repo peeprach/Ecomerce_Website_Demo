@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Banks & Cards</title>
+    <link rel="stylesheet" href="../css/global.css">
     <link rel="stylesheet" href="../customer/change.css">
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
@@ -11,29 +12,32 @@
 </head>
 <body>
     <nav class="navbar">
-        <div class="logo">
-          <img src="../images/logo433.png" alt="DES403 Logo" class="logo-img">
-          <span class="logo-text"> CSS MALL</span>
-        </div>
-        <ul class="nav-links">
-            <li><a href="../home.html">Home</a></li>
-            <li><a href="../shop.html">Shop</a></li>
-            <li><a href="../coupon.html">Coupon</a></li>
-          <li class="dropdown">
-            <a href="#" class="dropbtn">My account</a>
-            <div class="dropdown-content">
-              <a href="../acc.html">My Profile</a>
-              <a href="../myshop.html">My Shop</a>
-              <a href="../login.html" id="logout-btn" class="logout-btn">Logout</a>
-            </div>
-          </li> 
-          <li>
-            <a href="cart.html">
-                <img src="../images/shopping-cart.png" alt="Cart" class="cart-icon">
-            </a>
-          </li>  
-        </ul>
-      </nav>
+      <a class="nav-logo" href="../home.html">
+        <img src="../images/logo433.png" alt="CSS Mall" />
+        <span class="nav-logo-text">CSS <span>Mall</span></span>
+      </a>
+      <ul class="nav-links">
+        <li><a href="../home.html">Home</a></li>
+        <li><a href="../shop.html">Shop</a></li>
+        <li><a href="../coupon.html">Coupons</a></li>
+        <li class="nav-dropdown">
+          <span class="nav-dropdown-btn">My Account</span>
+          <div class="nav-dropdown-menu">
+            <a href="../acc.html">My Profile</a>
+            <a href="../myshop.html">My Shop</a>
+            <a href="../wishlist.html">Wishlist</a>
+            <a href="../customer/my-purchase.html">My Orders</a>
+            <a href="#" id="logout-btn" class="danger">Logout</a>
+          </div>
+        </li>
+      </ul>
+      <div class="nav-icons">
+        <a href="../cart.html" class="nav-icon-btn">
+          <img src="../images/shopping-cart.png" alt="Cart" />
+          <span class="nav-badge" id="cart-count">0</span>
+        </a>
+      </div>
+    </nav>
 
     <!-- Account Section -->
     <div class="container">
@@ -95,7 +99,6 @@
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
 
-    // แสดง email ของผู้ใช้อัตโนมัติ
     auth.onAuthStateChanged(user => {
         const emailElem = document.getElementById("user-email");
         const statusMsg = document.getElementById("status-msg");
@@ -107,7 +110,6 @@
         }
     });
 
-    // เปลี่ยน password
     function changePassword(){
         const user = auth.currentUser;
         const newPassword = document.getElementById("new-password").value;

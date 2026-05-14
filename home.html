@@ -1,61 +1,213 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shop Page</title>
-  <link rel="stylesheet" href="home.css">
-  <!-- Firebase UMD Build -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CSS Mall — Shop Everything</title>
+  <link rel="stylesheet" href="css/global.css" />
+  <link rel="stylesheet" href="css/home.css" />
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
-      <div class="logo">
-        <img src="images/logo433.png" alt="DES403 Logo" class="logo-img">
-        <span class="logo-text"> CSS MALL</span>
-      </div>
-      <ul class="nav-links">
-        <li><a href="home.html" class="active">Home</a></li>
-        <li><a href="shop.html">Shop</a></li>
-        <li><a href="coupon.html">Coupon</a></li>
-        <li class="dropdown">
-          <a href="#" class="dropbtn">My account</a>
-          <div class="dropdown-content">
-            <a href="acc.html">My Profile</a>
-            <a href="myshop.html">My Shop</a>
-            <a href="login.html" id="logout-btn" class="logout-btn">Logout</a>
-          </div>
-        </li> 
-        <li>
-          <a href="cart.html">
-              <img src="images/shopping-cart.png" alt="Cart" class="cart-icon">
-          </a>
-        </li>  
-      </ul>
-    </nav>
 
-    <section class="login-container">
-        <div class="background">
-            <img src="images/welcome_bg.png" alt="CSS MALL Background" class="bg-image">
-            <div class="overlay-box">
-                <h2>Welcome to CSS Mall</h2>
-                <p>Place where you can buy everything</p>
-                <a href="shop.html" class="btn-login">Get Start</a>
-            </div>
+  <!-- ── Navbar ──────────────────────────────────────────── -->
+  <nav class="navbar">
+    <a class="nav-logo" href="home.html">
+      <img src="images/logo433.png" alt="CSS Mall" />
+      <span class="nav-logo-text">CSS <span>Mall</span></span>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="home.html" class="active">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="coupon.html">Coupons</a></li>
+      <li class="nav-dropdown">
+        <span class="nav-dropdown-btn">My Account</span>
+        <div class="nav-dropdown-menu">
+          <a href="acc.html">My Profile</a>
+          <a href="myshop.html">My Shop</a>
+          <a href="wishlist.html">Wishlist</a>
+          <a href="customer/my-purchase.html">My Orders</a>
+          <a href="#" id="logout-btn" class="danger">Logout</a>
         </div>
-    </section>
+      </li>
+    </ul>
 
-    <section class="verify-system">
-      <div class="verify">
-        <h2>Why Us</h2>
+    <div class="nav-icons">
+      <a href="wishlist.html" class="nav-icon-btn" title="Wishlist">♡</a>
+      <a href="cart.html" class="nav-icon-btn" title="Cart">
+        <img src="images/shopping-cart.png" alt="Cart" />
+        <span class="nav-badge" id="cart-count">0</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ── Hero ────────────────────────────────────────────── -->
+  <section class="hero">
+    <div class="hero-bg">
+      <img src="images/welcome_bg.png" alt="CSS Mall" />
+    </div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <p class="hero-eyebrow">New Season Arrivals</p>
+      <h1>Shop <span>Everything</span><br>You Love</h1>
+      <p class="hero-sub">Thousands of products from sellers across the country.<br>Best prices, fast delivery, easy returns.</p>
+      <div class="hero-ctas">
+        <a href="shop.html" class="btn btn-primary btn-lg">Shop Now →</a>
+        <a href="coupon.html" class="btn btn-outline btn-lg">View Coupons 🎟️</a>
       </div>
-    </section>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><strong>10K+</strong><span>Products</span></div>
+      <div class="hero-stat-div"></div>
+      <div class="hero-stat"><strong>2K+</strong><span>Sellers</span></div>
+      <div class="hero-stat-div"></div>
+      <div class="hero-stat"><strong>50K+</strong><span>Happy Buyers</span></div>
+    </div>
+  </section>
 
-    <script>
-    // ✅ Firebase NEW project
+  <!-- ── Categories ───────────────────────────────────────── -->
+  <section class="categories-section">
+    <div class="categories-scroll">
+      <a href="shop.html" class="cat-chip cat-all">🛍️ All</a>
+      <a href="shop.html?cat=clothing" class="cat-chip">👕 Clothing</a>
+      <a href="shop.html?cat=shoes" class="cat-chip">👟 Shoes</a>
+      <a href="shop.html?cat=electronics" class="cat-chip">📱 Electronics</a>
+      <a href="shop.html?cat=accessories" class="cat-chip">💍 Accessories</a>
+      <a href="shop.html?cat=home" class="cat-chip">🏠 Home & Living</a>
+      <a href="shop.html?cat=sports" class="cat-chip">⚽ Sports</a>
+      <a href="shop.html?cat=beauty" class="cat-chip">💄 Beauty</a>
+    </div>
+  </section>
+
+  <!-- ── Features ─────────────────────────────────────────── -->
+  <section class="features-section">
+    <div class="feature-item">
+      <div class="feature-ico">🚚</div>
+      <div>
+        <h4>Free Shipping</h4>
+        <p>On orders over 2 items</p>
+      </div>
+    </div>
+    <div class="feature-divider"></div>
+    <div class="feature-item">
+      <div class="feature-ico">🔒</div>
+      <div>
+        <h4>Secure Payment</h4>
+        <p>End-to-end encryption</p>
+      </div>
+    </div>
+    <div class="feature-divider"></div>
+    <div class="feature-item">
+      <div class="feature-ico">↩️</div>
+      <div>
+        <h4>Easy Returns</h4>
+        <p>30-day no-questions return</p>
+      </div>
+    </div>
+    <div class="feature-divider"></div>
+    <div class="feature-item">
+      <div class="feature-ico">🎧</div>
+      <div>
+        <h4>24/7 Support</h4>
+        <p>Always here to help</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── New Arrivals ──────────────────────────────────────── -->
+  <section class="arrivals-section">
+    <div class="section-heading">
+      <h2>New Arrivals</h2>
+      <p>Fresh products just added by our sellers</p>
+    </div>
+    <div class="arrivals-grid" id="arrivals-grid">
+      <!-- Skeleton cards -->
+      <div class="skeleton-card"><div class="skeleton sh-img"></div><div class="skeleton sh-line"></div><div class="skeleton sh-line sh-short"></div></div>
+      <div class="skeleton-card"><div class="skeleton sh-img"></div><div class="skeleton sh-line"></div><div class="skeleton sh-line sh-short"></div></div>
+      <div class="skeleton-card"><div class="skeleton sh-img"></div><div class="skeleton sh-line"></div><div class="skeleton sh-line sh-short"></div></div>
+      <div class="skeleton-card"><div class="skeleton sh-img"></div><div class="skeleton sh-line"></div><div class="skeleton sh-line sh-short"></div></div>
+      <div class="skeleton-card"><div class="skeleton sh-img"></div><div class="skeleton sh-line"></div><div class="skeleton sh-line sh-short"></div></div>
+    </div>
+    <div style="text-align:center;margin-top:36px;">
+      <a href="shop.html" class="btn btn-outline">View All Products →</a>
+    </div>
+  </section>
+
+  <!-- ── Promo Banner ─────────────────────────────────────── -->
+  <section class="promo-banner">
+    <div class="promo-content">
+      <p class="promo-eyebrow">Limited Time Offer</p>
+      <h2>Get up to 20% off<br>your first order</h2>
+      <p>Use code <strong>SAVE20</strong> at checkout</p>
+      <a href="coupon.html" class="btn btn-dark btn-lg">Grab Coupon →</a>
+    </div>
+    <div class="promo-deco">🎉</div>
+  </section>
+
+  <!-- ── Sell with Us ─────────────────────────────────────── -->
+  <section class="sell-section">
+    <div class="sell-card">
+      <div class="sell-icon">🏪</div>
+      <h3>Start Selling Today</h3>
+      <p>Join thousands of sellers on CSS Mall. List your products in minutes and reach buyers nationwide.</p>
+      <a href="myshop.html" class="btn btn-primary" style="margin-top:20px;">Open Your Shop</a>
+    </div>
+    <div class="sell-steps">
+      <div class="sell-step"><span>1</span><div><strong>Create your account</strong><p>Sign up for free in seconds</p></div></div>
+      <div class="sell-step"><span>2</span><div><strong>List your product</strong><p>Add photos, price and description</p></div></div>
+      <div class="sell-step"><span>3</span><div><strong>Start earning</strong><p>Buyers find and purchase your items</p></div></div>
+    </div>
+  </section>
+
+  <!-- ── Footer ───────────────────────────────────────────── -->
+  <footer class="site-footer">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <span class="nav-logo-text" style="font-size:22px;">CSS <span>Mall</span></span>
+        <p>The best online marketplace for buyers and sellers. Shop thousands of products with confidence.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Shop</h4>
+        <a href="shop.html">All Products</a>
+        <a href="shop.html?cat=clothing">Clothing</a>
+        <a href="shop.html?cat=electronics">Electronics</a>
+        <a href="coupon.html">Coupons</a>
+      </div>
+      <div class="footer-col">
+        <h4>Account</h4>
+        <a href="acc.html">My Profile</a>
+        <a href="myshop.html">My Shop</a>
+        <a href="wishlist.html">Wishlist</a>
+        <a href="customer/my-purchase.html">Orders</a>
+      </div>
+      <div class="footer-col">
+        <h4>Help</h4>
+        <a href="#">FAQ</a>
+        <a href="#">Shipping Policy</a>
+        <a href="#">Return Policy</a>
+        <a href="#">Contact Us</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© 2026 CSS Mall. All rights reserved.</span>
+      <span>Made with ❤️ for DES403</span>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script>
+    function showToast(msg, duration = 2500) {
+      const t = document.getElementById("toast");
+      t.textContent = msg;
+      t.style.display = "flex";
+      clearTimeout(t._timer);
+      t._timer = setTimeout(() => { t.style.display = "none"; }, duration);
+    }
+
     const firebaseConfig = {
       apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
       authDomain: "mini-ecom-39979.firebaseapp.com",
@@ -64,27 +216,97 @@
       messagingSenderId: "43435045240",
       appId: "1:43435045240:web:ba425c522e37b4c1a7d88d"
     };
-
     firebase.initializeApp(firebaseConfig);
     const auth = firebase.auth();
+    const db   = firebase.firestore();
 
-    auth.onAuthStateChanged(user => {
-      if (!user) {
-        window.location.href = "login.html";
-      }
+    auth.onAuthStateChanged(async user => {
+      if (!user) { window.location.href = "login.html"; return; }
+
+      document.getElementById("logout-btn").onclick = e => {
+        e.preventDefault();
+        auth.signOut().then(() => window.location.href = "login.html");
+      };
+
+      // Cart count
+      db.collection("carts").doc(user.uid).collection("items")
+        .onSnapshot(snap => {
+          let t = 0; snap.forEach(d => t += d.data().quantity || 0);
+          document.getElementById("cart-count").textContent = t;
+        });
+
+      // Load new arrivals
+      loadArrivals(user.uid);
     });
 
-    // 🚪 Logout
-    document.getElementById('logout-btn').addEventListener('click', async (e) => {
-      e.preventDefault();
+    async function loadArrivals(uid) {
+      const grid = document.getElementById("arrivals-grid");
+      const snap = await db.collection("products").orderBy("createdAt", "desc").limit(5).get()
+        .catch(() => null);
 
-      try {
-        await auth.signOut();
-        window.location.href = "login.html";
-      } catch (error) {
-        console.error("Logout error:", error);
+      grid.innerHTML = "";
+      if (!snap || snap.empty) {
+        grid.innerHTML = '<p style="text-align:center;color:#9ca3af;padding:40px 0;grid-column:1/-1;">No products yet. Be the first to add one!</p>';
+        return;
       }
-    });
+
+      snap.forEach(doc => {
+        const p = { id: doc.id, ...doc.data() };
+        const card = document.createElement("div");
+        card.className = "product-card";
+        card.innerHTML = `
+          <div class="product-card-img">
+            <a href="product-detail.html?id=${p.id}">
+              <img src="${p.imageUrl || 'images/placeholder.jpg'}" alt="${p.name}" loading="lazy" />
+            </a>
+            <button class="card-wish-btn" onclick="addToWishlist('${p.id}',this)" title="Save to wishlist">♡</button>
+          </div>
+          <div class="product-card-body">
+            <a href="product-detail.html?id=${p.id}"><div class="product-card-name">${p.name}</div></a>
+            <div class="product-card-desc">${p.shortDesc || p.description || ''}</div>
+            <div class="product-card-price">$${Number(p.price).toFixed(2)}</div>
+            <div class="product-card-actions">
+              <button class="btn-add-to-cart" onclick="addToCart('${p.id}')">Add to Cart</button>
+              <button class="btn-buy-now-card" onclick="buyNow('${p.id}')">Buy Now</button>
+            </div>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function addToCart(productId) {
+      const user = auth.currentUser;
+      if (!user) { showToast("Please log in first."); return; }
+      const ref = db.collection("carts").doc(user.uid).collection("items").doc(productId);
+      ref.get().then(d => d.exists ? ref.update({ quantity: d.data().quantity + 1 }) : ref.set({ quantity: 1 }))
+        .then(() => showToast("Added to cart! 🛒"));
+    }
+
+    function buyNow(productId) {
+      const user = auth.currentUser;
+      if (!user) { showToast("Please log in first."); return; }
+      const ref = db.collection("carts").doc(user.uid).collection("items").doc(productId);
+      ref.get().then(d => d.exists ? ref.update({ quantity: d.data().quantity + 1 }) : ref.set({ quantity: 1 }))
+        .then(() => window.location.href = "cart.html");
+    }
+
+    async function addToWishlist(productId, btn) {
+      const user = auth.currentUser;
+      if (!user) { showToast("Please log in first."); return; }
+      const ref = db.collection("users").doc(user.uid).collection("wishlist").doc(productId);
+      const d = await ref.get();
+      if (d.exists) {
+        await ref.delete();
+        btn.textContent = "♡"; btn.style.color = "";
+        showToast("Removed from wishlist");
+      } else {
+        const ps = await db.collection("products").doc(productId).get();
+        if (ps.exists) await ref.set({ ...ps.data(), savedAt: firebase.firestore.FieldValue.serverTimestamp() });
+        btn.textContent = "♥"; btn.style.color = "#ef4444";
+        showToast("Saved to wishlist ♥");
+      }
+    }
   </script>
 </body>
 </html>

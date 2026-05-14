@@ -1,128 +1,498 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Add Product</title>
-<link rel="stylesheet" href="add-product.css"/>
-<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Add Product — CSS Mall</title>
+  <link rel="stylesheet" href="css/global.css" />
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.17.1/firebase-firestore-compat.js"></script>
+  <style>
+    body { background: var(--light); }
+
+    /* ── Page wrap ── */
+    .page-hero {
+      background: linear-gradient(135deg,#1a1a2e 0%,#16213e 50%,#0f3460 100%);
+      padding: 36px 48px 30px;
+      color: #fff;
+    }
+    .page-hero h1 { font-size: 26px; font-weight: 800; margin-bottom: 4px; }
+    .page-hero p  { font-size: 13px; color: rgba(255,255,255,.55); font-weight: 400; }
+
+    .page-wrap { max-width: 780px; margin: 28px auto 60px; padding: 0 24px; }
+
+    .back-link {
+      display: inline-flex; align-items: center; gap: 6px;
+      margin-bottom: 20px; color: var(--muted); text-decoration: none;
+      font-size: 14px; font-weight: 500; transition: color .2s;
+    }
+    .back-link:hover { color: var(--dark); }
+
+    /* ── Cards ── */
+    .form-card {
+      background: var(--white);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      padding: 28px 32px;
+      margin-bottom: 20px;
+    }
+    .form-card h3 {
+      font-size: 15px; font-weight: 700; color: var(--dark2);
+      margin-bottom: 20px; padding-bottom: 12px;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* ── Fields ── */
+    .field { margin-bottom: 16px; }
+    .field:last-child { margin-bottom: 0; }
+    .field label {
+      display: block; font-size: 13px; font-weight: 700;
+      color: var(--dark2); margin-bottom: 6px;
+    }
+    .field label .req { color: var(--red); }
+    .field label .hint { font-size: 11px; font-weight: 400; color: var(--muted); float: right; }
+    .field input, .field textarea, .field select {
+      width: 100%; padding: 11px 13px;
+      border: 1.5px solid #e5e7eb; border-radius: var(--radius);
+      font-size: 14px; font-family: var(--font);
+      transition: border-color .2s; box-sizing: border-box;
+      font-weight: 400; color: var(--dark); background: var(--white);
+      outline: none;
+    }
+    .field input:focus, .field textarea:focus, .field select:focus {
+      border-color: var(--brand);
+    }
+    .field textarea { resize: vertical; min-height: 80px; }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+
+    /* ── Image section ── */
+    .img-tabs {
+      display: flex; border-bottom: 2px solid #f0f0f0; margin-bottom: 18px;
+    }
+    .img-tab {
+      padding: 9px 20px; border: none; background: none; cursor: pointer;
+      font-size: 13px; font-weight: 700; color: var(--muted);
+      position: relative; transition: color .2s; font-family: var(--font);
+    }
+    .img-tab.active { color: var(--brand-dark); }
+    .img-tab.active::after {
+      content: ""; position: absolute; bottom: -2px; left: 0; right: 0;
+      height: 2px; background: var(--brand);
+    }
+    .img-panel { display: none; }
+    .img-panel.active { display: block; }
+
+    /* Upload zone */
+    .upload-zone {
+      border: 2px dashed #d1d5db; border-radius: var(--radius-lg);
+      padding: 32px 20px; text-align: center; cursor: pointer;
+      background: var(--light); transition: all .2s; position: relative;
+    }
+    .upload-zone:hover, .upload-zone.drag-over {
+      border-color: var(--brand); background: var(--brand-light);
+    }
+    .upload-zone input {
+      position: absolute; inset: 0; opacity: 0; cursor: pointer;
+      width: 100%; height: 100%;
+    }
+    .upload-zone .uz-icon { font-size: 36px; margin-bottom: 10px; }
+    .upload-zone p { font-size: 14px; color: var(--gray); margin: 0; font-weight: 400; }
+    .upload-zone p strong { color: var(--brand-dark); font-weight: 700; }
+    .upload-zone .uz-sub { font-size: 12px; margin-top: 4px; color: var(--muted); }
+
+    /* Previews */
+    .img-preview-box {
+      margin-top: 14px; border-radius: var(--radius-lg);
+      overflow: hidden; border: 1px solid #e5e7eb;
+      background: var(--light); display: none;
+    }
+    .img-preview-box img {
+      width: 100%; max-height: 220px; object-fit: contain; display: block;
+    }
+
+    /* Upload progress */
+    .upload-progress {
+      display: none; margin-top: 12px;
+      background: var(--light); border-radius: var(--radius);
+      padding: 12px 16px; border: 1px solid #e5e7eb;
+    }
+    .upload-progress p { font-size: 12px; color: var(--gray); margin-bottom: 6px; }
+    .upload-progress progress {
+      width: 100%; height: 8px; border-radius: 4px;
+      accent-color: var(--brand);
+    }
+
+    /* ── Submit ── */
+    .submit-btn {
+      width: 100%; padding: 15px;
+      background: var(--brand); color: var(--white);
+      border: none; border-radius: var(--radius-lg);
+      font-size: 16px; font-weight: 700;
+      cursor: pointer; font-family: var(--font);
+      transition: background .2s; display: flex;
+      align-items: center; justify-content: center; gap: 8px;
+    }
+    .submit-btn:hover:not(:disabled) { background: var(--brand-dark); }
+    .submit-btn:disabled { background: #d1d5db; cursor: not-allowed; }
+
+    @media (max-width: 600px) {
+      .field-row { grid-template-columns: 1fr; }
+      .form-card { padding: 20px 18px; }
+      .page-hero { padding: 28px 16px; }
+      .page-wrap { padding: 0 14px; }
+    }
+  </style>
 </head>
 <body>
-<nav class="navbar">
-  <div class="logo">
-      <img src="images/logo433.png" alt="DES403 Logo" class="logo-img" />
-      <span class="logo-text">CSS MALL</span>
-  </div>
-  <ul class="nav-links">
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a class="nav-logo" href="home.html">
+      <img src="images/logo433.png" alt="CSS Mall" />
+      <span class="nav-logo-text">CSS <span>Mall</span></span>
+    </a>
+    <ul class="nav-links">
       <li><a href="home.html">Home</a></li>
       <li><a href="shop.html">Shop</a></li>
-      <li><a href="coupon.html">Coupon</a></li>
-      <li class="dropdown">
-          <a href="#" class="dropbtn">My Account</a>
-          <div class="dropdown-content">
-              <a href="acc.html">My Profile</a>
-              <a href="myshop.html" class="active">My Shop</a>
-              <a href="#" id="logout-btn">Logout</a>
+      <li class="nav-dropdown">
+        <span class="nav-dropdown-btn">My Account</span>
+        <div class="nav-dropdown-menu">
+          <a href="acc.html">My Profile</a>
+          <a href="myshop.html" class="active">My Shop</a>
+          <a href="wishlist.html">Wishlist</a>
+          <a href="#" id="logout-btn" class="danger">Logout</a>
+        </div>
+      </li>
+    </ul>
+    <div class="nav-icons">
+      <a href="cart.html" class="nav-icon-btn">
+        <img src="images/shopping-cart.png" alt="Cart" />
+        <span class="nav-badge" id="cart-count">0</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <div class="page-hero">
+    <h1>Add New Product</h1>
+    <p>Your product will go live in the marketplace right after publishing.</p>
+  </div>
+
+  <div class="page-wrap">
+    <a href="myshop.html" class="back-link">← Back to My Shop</a>
+
+    <form id="add-product-form" novalidate>
+
+      <!-- ── Image ── -->
+      <div class="form-card">
+        <h3>📷 Product Image</h3>
+
+        <div class="img-tabs">
+          <button type="button" class="img-tab active" data-panel="panel-url">Paste Image URL</button>
+          <button type="button" class="img-tab" data-panel="panel-upload">Upload File</button>
+        </div>
+
+        <!-- URL tab -->
+        <div class="img-panel active" id="panel-url">
+          <div class="field">
+            <label>Image URL</label>
+            <input type="url" id="image-url" placeholder="https://example.com/product.jpg" />
           </div>
-      </li>
-      <li>
-          <a href="cart.html">
-          <img src="images/shopping-cart.png" alt="Cart" class="cart-icon" />
-          </a>
-      </li>
-  </ul>
-</nav>
+          <div class="img-preview-box" id="url-preview-box">
+            <img id="url-preview" src="" alt="Preview" />
+          </div>
+        </div>
 
-<main class="form-container">
-  <h1>Add Product</h1>
-  <form id="add-product-form" class="product-form">
-    <div class="form-row">
-      <label for="product-name">Name</label>
-      <input type="text" id="product-name" required>
-    </div>
+        <!-- Upload tab (ImgBB) -->
+        <div class="img-panel" id="panel-upload">
+          <input type="hidden" id="imgbb-key" value="1041f1bf5883dba56e685240f5f0f0ca" />
+          <div class="upload-zone" id="upload-zone">
+            <input type="file" id="img-file" accept="image/*" />
+            <div class="uz-icon">🖼️</div>
+            <p><strong>Click to upload</strong> or drag & drop</p>
+            <p class="uz-sub">JPG, PNG, WEBP · Max 32 MB · Hosted via ImgBB</p>
+          </div>
+          <div class="img-preview-box" id="file-preview-box">
+            <img id="img-preview" src="" alt="Preview" />
+          </div>
+          <div class="upload-progress" id="upload-progress">
+            <p id="upload-status">Uploading image…</p>
+            <progress id="progress-bar" max="100"></progress>
+          </div>
+        </div>
+      </div>
 
-    <div class="form-row">
-      <label for="price">Price</label>
-      <input type="number" id="price" step="0.01" placeholder="0.00" required>
-    </div>
+      <!-- ── Basic Info ── -->
+      <div class="form-card">
+        <h3>📝 Basic Information</h3>
+        <div class="field">
+          <label>Product Name <span class="req">*</span></label>
+          <input type="text" id="product-name" maxlength="120" placeholder="e.g. Nike Air Max 270" required />
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Price ($) <span class="req">*</span></label>
+            <input type="number" id="price" min="0" step="0.01" placeholder="0.00" required />
+          </div>
+          <div class="field">
+            <label>Stock Quantity <span class="req">*</span></label>
+            <input type="number" id="stock" min="0" placeholder="0" required />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Category <span class="req">*</span></label>
+            <select id="category" required>
+              <option value="">Select category</option>
+              <option value="clothing">Clothing</option>
+              <option value="shoes">Shoes</option>
+              <option value="accessories">Accessories</option>
+              <option value="electronics">Electronics</option>
+              <option value="home">Home & Living</option>
+              <option value="sports">Sports</option>
+              <option value="beauty">Beauty</option>
+              <option value="food">Food & Drinks</option>
+              <option value="books">Books</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Brand <span style="font-size:11px;font-weight:400;color:var(--muted);">(optional)</span></label>
+            <input type="text" id="brand" placeholder="e.g. Nike, Samsung" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Condition <span class="req">*</span></label>
+            <select id="condition" required>
+              <option value="new">New</option>
+              <option value="used">Used</option>
+              <option value="refurbished">Refurbished</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Shipping Fee ($)</label>
+            <input type="number" id="shipping-fee" min="0" step="0.01" placeholder="9.00" value="9" />
+          </div>
+        </div>
+      </div>
 
-    <div class="form-row">
-      <label for="product-description">Description</label>
-      <textarea id="product-description" rows="3"></textarea>
-    </div>
+      <!-- ── Description ── -->
+      <div class="form-card">
+        <h3>📄 Description</h3>
+        <div class="field">
+          <label>
+            Short Description <span class="req">*</span>
+            <span class="hint" id="short-count">0 / 200</span>
+          </label>
+          <textarea id="short-desc" maxlength="200" rows="3"
+            placeholder="Brief summary shown on product cards in the shop…" required></textarea>
+        </div>
+        <div class="field">
+          <label>
+            Full Product Details
+            <span class="hint" id="detail-count">0 / 2000</span>
+          </label>
+          <textarea id="detail" maxlength="2000" rows="6"
+            placeholder="Full specifications, materials, features, etc. Shown on the product detail page…"></textarea>
+        </div>
+        <div class="field">
+          <label>Tags <span style="font-size:11px;font-weight:400;color:var(--muted);">(comma separated, optional)</span></label>
+          <input type="text" id="tags" placeholder="e.g. shoes, running, sport" />
+        </div>
+      </div>
 
-    <div class="form-row">
-      <label for="image-url">Image URL</label>
-      <input type="text" id="image-url" placeholder="https://example.com/image.jpg" required>
-    </div>
+      <button type="submit" class="submit-btn" id="submit-btn">
+        🚀 Publish Product
+      </button>
+    </form>
+  </div>
 
-    <div class="form-row full-width">
-      <button type="submit">Add Product</button>
-    </div>
-  </form>
-</main>
+  <div class="toast" id="toast"></div>
 
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
-  authDomain: "mini-ecom-39979.firebaseapp.com",
-  projectId: "mini-ecom-39979",
-  storageBucket: "mini-ecom-39979.firebasestorage.app",
-  messagingSenderId: "43435045240",
-  appId: "1:43435045240:web:ba425c522e37b4c1a7d88d"
-};
-firebase.initializeApp(firebaseConfig);
-
-const auth = firebase.auth();
-const db = firebase.firestore();
-
-auth.onAuthStateChanged(user => {
-  if (!user) {
-    window.location.href = "login.html";
-    return;
-  }
-
-  const form = document.getElementById("add-product-form");
-
-  form.addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const name = document.getElementById("product-name").value.trim();
-    const price = parseFloat(document.getElementById("price").value);
-    const description = document.getElementById("product-description").value.trim();
-    const imageUrl = document.getElementById("image-url").value.trim();
-
-    if (!name || !price || !imageUrl) {
-      alert("Please fill all required fields");
-      return;
+  <script>
+    function showToast(msg, duration = 3000) {
+      const t = document.getElementById("toast");
+      t.textContent = msg; t.style.display = "flex";
+      clearTimeout(t._t); t._t = setTimeout(() => { t.style.display = "none"; }, duration);
     }
 
-    const productData = {
-      name,
-      price,
-      description,
-      imageUrl,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
+    const firebaseConfig = {
+      apiKey: "AIzaSyCAImX62Ix7bb6TKdAqWVEZv6q3wQ9tDX8",
+      authDomain: "mini-ecom-39979.firebaseapp.com",
+      projectId: "mini-ecom-39979",
+      storageBucket: "mini-ecom-39979.firebasestorage.app",
+      messagingSenderId: "43435045240",
+      appId: "1:43435045240:web:ba425c522e37b4c1a7d88d"
     };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const db   = firebase.firestore();
 
-    try {
-      await db.collection("users").doc(user.uid).collection("products").add(productData);
-      alert("Product added successfully!");
-      window.location.href = "viewshop.html"; 
-    } catch (err) {
-      console.error(err);
-      alert("Failed to add product");
-    }
-  });
+    // ── Image tabs ────────────────────────────────────────────────
+    document.querySelectorAll(".img-tab").forEach(tab => {
+      tab.addEventListener("click", () => {
+        document.querySelectorAll(".img-tab").forEach(t => t.classList.remove("active"));
+        document.querySelectorAll(".img-panel").forEach(p => p.classList.remove("active"));
+        tab.classList.add("active");
+        document.getElementById(tab.dataset.panel).classList.add("active");
+      });
+    });
 
-  // Logout
-  document.getElementById("logout-btn").addEventListener("click", () => {
-    auth.signOut().then(() => window.location.href = "login.html");
-  });
-});
-</script>
+    // ── URL preview ───────────────────────────────────────────────
+    const imageUrlInput  = document.getElementById("image-url");
+    const urlPreview     = document.getElementById("url-preview");
+    const urlPreviewBox  = document.getElementById("url-preview-box");
+    let urlTimer;
+    imageUrlInput.addEventListener("input", () => {
+      clearTimeout(urlTimer);
+      urlTimer = setTimeout(() => {
+        const url = imageUrlInput.value.trim();
+        if (url) { urlPreview.src = url; urlPreviewBox.style.display = "block"; }
+        else urlPreviewBox.style.display = "none";
+      }, 600);
+    });
+    urlPreview.addEventListener("error", () => { urlPreviewBox.style.display = "none"; });
 
+    // ── File upload preview ───────────────────────────────────────
+    const imgFile       = document.getElementById("img-file");
+    const imgPreview    = document.getElementById("img-preview");
+    const filePreviewBox= document.getElementById("file-preview-box");
+    const uploadZone    = document.getElementById("upload-zone");
+
+    imgFile.addEventListener("change", () => {
+      const file = imgFile.files[0];
+      if (!file) return;
+      imgPreview.src = URL.createObjectURL(file);
+      filePreviewBox.style.display = "block";
+    });
+
+    uploadZone.addEventListener("dragover", e => { e.preventDefault(); uploadZone.classList.add("drag-over"); });
+    uploadZone.addEventListener("dragleave", () => uploadZone.classList.remove("drag-over"));
+    uploadZone.addEventListener("drop", e => {
+      e.preventDefault(); uploadZone.classList.remove("drag-over");
+      if (e.dataTransfer.files[0]) {
+        imgFile.files = e.dataTransfer.files;
+        imgFile.dispatchEvent(new Event("change"));
+      }
+    });
+
+    // ── Char counters ─────────────────────────────────────────────
+    document.getElementById("short-desc").addEventListener("input", function() {
+      document.getElementById("short-count").textContent = `${this.value.length} / 200`;
+    });
+    document.getElementById("detail").addEventListener("input", function() {
+      document.getElementById("detail-count").textContent = `${this.value.length} / 2000`;
+    });
+
+    // ── Auth ──────────────────────────────────────────────────────
+    auth.onAuthStateChanged(user => {
+      if (!user) { window.location.href = "login.html"; return; }
+
+      document.getElementById("logout-btn").onclick = e => {
+        e.preventDefault(); auth.signOut().then(() => window.location.href = "login.html");
+      };
+
+      // Cart count
+      db.collection("carts").doc(user.uid).collection("items").onSnapshot(snap => {
+        let t = 0; snap.forEach(d => t += d.data().quantity || 0);
+        document.getElementById("cart-count").textContent = t;
+      });
+
+      // ── Form submit ───────────────────────────────────────────
+      document.getElementById("add-product-form").addEventListener("submit", async e => {
+        e.preventDefault();
+
+        const name      = document.getElementById("product-name").value.trim();
+        const price     = parseFloat(document.getElementById("price").value);
+        const stock     = parseInt(document.getElementById("stock").value);
+        const category  = document.getElementById("category").value;
+        const brand     = document.getElementById("brand").value.trim();
+        const condition = document.getElementById("condition").value;
+        const shipping  = parseFloat(document.getElementById("shipping-fee").value) || 9;
+        const shortDesc = document.getElementById("short-desc").value.trim();
+        const detail    = document.getElementById("detail").value.trim();
+        const tags      = document.getElementById("tags").value.trim();
+
+        // Validate required fields
+        if (!name)      { showToast("Product name is required."); return; }
+        if (!price || price <= 0) { showToast("Please enter a valid price."); return; }
+        if (isNaN(stock) || stock < 0) { showToast("Please enter a valid stock quantity."); return; }
+        if (!category)  { showToast("Please select a category."); return; }
+        if (!shortDesc) { showToast("Short description is required."); return; }
+
+        const btn = document.getElementById("submit-btn");
+        btn.disabled = true;
+        btn.innerHTML = `<span style="display:inline-block;animation:spin .8s linear infinite;">⏳</span> Publishing…`;
+
+        try {
+          let imageUrl = "";
+          const activePanel = document.querySelector(".img-panel.active").id;
+
+          if (activePanel === "panel-url") {
+            imageUrl = imageUrlInput.value.trim();
+          } else {
+            // ImgBB upload
+            const file   = imgFile.files[0];
+            const apiKey = document.getElementById("imgbb-key").value.trim();
+
+            if (!file) {
+              showToast("Please select an image to upload, or switch to URL tab.");
+              btn.disabled = false; btn.innerHTML = "🚀 Publish Product"; return;
+            }
+
+            const progressWrap  = document.getElementById("upload-progress");
+            const uploadStatus  = document.getElementById("upload-status");
+            progressWrap.style.display = "block";
+            uploadStatus.textContent   = "Uploading image to ImgBB…";
+
+            const formData = new FormData();
+            formData.append("image", file);
+            const res  = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+              method: "POST", body: formData
+            });
+            const json = await res.json();
+            progressWrap.style.display = "none";
+
+            if (!json.success) throw new Error(json.error?.message || "Upload failed");
+            imageUrl = json.data.url;
+          }
+
+          await db.collection("products").add({
+            name,
+            price,
+            stock,
+            category,
+            brand:       brand || null,
+            condition,
+            shippingFee: shipping,
+            shortDesc,
+            description: shortDesc,
+            detail:      detail || shortDesc,
+            tags:        tags || null,
+            imageUrl,
+            sellerId:    user.uid,
+            sales:       0,
+            createdAt:   firebase.firestore.FieldValue.serverTimestamp()
+          });
+
+          showToast("✅ Product published! Redirecting…");
+          setTimeout(() => window.location.href = "myshop.html", 1500);
+
+        } catch (err) {
+          console.error(err);
+          showToast("Error: " + err.message);
+          btn.disabled = false;
+          btn.innerHTML = "🚀 Publish Product";
+        }
+      });
+    });
+  </script>
+
+  <style>
+    @keyframes spin { to { transform: rotate(360deg); } }
+  </style>
 </body>
 </html>
